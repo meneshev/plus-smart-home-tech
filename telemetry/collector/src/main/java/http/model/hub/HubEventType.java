@@ -1,4 +1,4 @@
-package model.hub;
+package http.model.hub;
 
 public enum HubEventType {
     DEVICE_ADDED,

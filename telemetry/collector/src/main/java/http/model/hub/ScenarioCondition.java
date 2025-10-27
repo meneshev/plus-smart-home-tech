@@ -1,4 +1,4 @@
-package model.hub;
+package http.model.hub;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,8 +7,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class DeviceAction {
+public class ScenarioCondition {
     private String sensorId;
-    private DeviceActionType type;
+    private ConditionType type;
+    private OperationConditionType operation;
     private int value;
 }

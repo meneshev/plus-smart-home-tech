@@ -1,4 +1,4 @@
-package model.event;
+package http.model.event;
 
 public enum SensorEventType {
     MOTION_SENSOR_EVENT,

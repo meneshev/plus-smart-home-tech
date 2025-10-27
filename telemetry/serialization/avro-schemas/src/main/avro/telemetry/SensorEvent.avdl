@@ -18,7 +18,7 @@ protocol SensorEventProtocol {
 		int voltage;
 	}
 
-	record SwichSensorAvro {
+	record SwitchSensorAvro {
 		boolean state;
 	}
 
@@ -36,7 +36,7 @@ protocol SensorEventProtocol {
 			ClimateSensorAvro,
 			LightSensorAvro,
 			MotionSensorAvro,
-			SwichSensorAvro,
+			SwitchSensorAvro,
 			TemperatureSensorAvro
 		} payload;
 	}

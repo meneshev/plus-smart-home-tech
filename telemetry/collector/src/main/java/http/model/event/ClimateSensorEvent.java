@@ -1,10 +1,10 @@
-package model.event;
+package http.model.event;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.*;
 
-@Getter
-@Setter
-@ToString(callSuper = true)
+@JsonTypeName("climateSensorEvent")
+@Getter @Setter @ToString(callSuper = true)
 public class ClimateSensorEvent extends SensorEvent {
     private int temperatureC;
     private int humidity;
