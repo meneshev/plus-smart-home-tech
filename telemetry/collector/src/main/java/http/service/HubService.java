@@ -1,5 +1,7 @@
 package http.service;
 
-public interface HubService {
+import http.model.hub.HubEvent;
 
+public interface HubService {
+    void sendToQueue(HubEvent event);
 }

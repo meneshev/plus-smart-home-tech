@@ -1,13 +1,15 @@
 package http.model.event;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@JsonTypeName("climateSensorEvent")
 @Getter @Setter @ToString(callSuper = true)
 public class ClimateSensorEvent extends SensorEvent {
+    @NotNull
     private int temperatureC;
+    @NotNull
     private int humidity;
+    @NotNull
     private int co2Level;
 
     @Override

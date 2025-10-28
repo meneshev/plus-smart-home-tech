@@ -1,9 +1,7 @@
 package http.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import http.model.event.SensorEvent;
 
-@Service
-@RequiredArgsConstructor
-public class SensorService {
+public interface SensorService {
+    void sendToQueue(SensorEvent event);
 }

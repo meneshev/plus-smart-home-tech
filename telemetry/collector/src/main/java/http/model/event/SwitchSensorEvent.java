@@ -1,13 +1,13 @@
 package http.model.event;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@JsonTypeName("switchSensorEvent")
 @Getter @Setter @ToString(callSuper = true)
 public class SwitchSensorEvent extends SensorEvent {
+    @NotNull
     private boolean state;
 
     @Override
