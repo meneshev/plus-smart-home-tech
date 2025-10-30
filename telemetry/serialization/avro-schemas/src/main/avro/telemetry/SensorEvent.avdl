@@ -22,7 +22,6 @@ protocol SensorEventProtocol {
 		boolean state;
 	}
 
-	//в примере указано без наследования
 	record TemperatureSensorAvro {
 		int temperature_c;
 		int temperature_f;

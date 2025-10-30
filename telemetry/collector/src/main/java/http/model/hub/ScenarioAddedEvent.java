@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,6 @@ import java.util.List;
 @Setter
 @ToString(callSuper = true)
 public class ScenarioAddedEvent extends HubEvent {
-    private Instant timestamp = Instant.now();
     @NotBlank
     private String name;
     @NotNull

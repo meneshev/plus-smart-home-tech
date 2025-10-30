@@ -1,36 +1,32 @@
 package http.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import http.service.SmartHomeTechService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import http.model.event.SensorEvent;
 import http.model.hub.HubEvent;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
 @RequestMapping("/events")
+@RequiredArgsConstructor
 public class EventsController {
-    private final ObjectMapper mapper;
-
-    public EventsController(ObjectMapper mapper) {
-        this.mapper = mapper;
-    }
+    private final SmartHomeTechService smartHomeTechService;
 
     @PostMapping("/hubs")
-    public void processHubEvent(@RequestBody @Valid HubEvent event) throws JsonProcessingException {
+    public ResponseEntity<Void> processHubEvent(@RequestBody @Valid HubEvent event) {
         log.info("HubEvent received: " + event.toString());
-        System.out.println(mapper.writeValueAsString(event));
+        smartHomeTechService.sendToQueue(event);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/sensors")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Void> processSensorEvent(@RequestBody @Valid SensorEvent event) throws JsonProcessingException {
+    public ResponseEntity<Void> processSensorEvent(@RequestBody @Valid SensorEvent event) {
         log.info("SensorEvent received: " + event.toString());
-        System.out.println("JSON: " + mapper.writeValueAsString(event));
+        smartHomeTechService.sendToQueue(event);
         return ResponseEntity.ok().build();
     }
 }

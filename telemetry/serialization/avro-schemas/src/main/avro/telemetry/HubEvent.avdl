@@ -43,7 +43,7 @@ protocol HubEventProtocol {
 		string sensor_id;
 		CondiionTypeAvro type;
 		ConditionOperationAvro operation;
-		union { null, int, boolean } value; //Может быть не задано, если неприменимо (null) или равно целому числу или значению логического типа (boolean).
+		union { null, int, boolean } value;
 	}
 
 	record DeviceActionAvro {

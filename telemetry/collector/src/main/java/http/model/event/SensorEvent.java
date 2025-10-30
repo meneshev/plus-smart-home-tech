@@ -12,7 +12,8 @@ import java.time.Instant;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type"
+        property = "type",
+        defaultImpl = SensorEventType.class
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ClimateSensorEvent.class, name = "CLIMATE_SENSOR_EVENT"),
@@ -27,7 +28,7 @@ public abstract class SensorEvent {
     private String id;
     @NotNull
     private String hubId;
-    private Instant timestamp = Instant.now();
+    private Instant timestamp;
 
     public abstract SensorEventType getType();
 }

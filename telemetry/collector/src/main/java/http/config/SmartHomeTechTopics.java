@@ -1,0 +1,7 @@
+package http.config;
+
+public class SmartHomeTechTopics {
+    public static final String TELEMETRY_SENSORS_V1 = "telemetry.sensors.v1";
+    public static final String TELEMETRY_HUBS_V1 = "telemetry.hubs.v1";
+    public static final String TELEMETRY_SNAPSHOTS_V1 = "telemetry.snapshots.v1";
+}
