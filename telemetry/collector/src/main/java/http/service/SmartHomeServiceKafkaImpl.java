@@ -1,7 +1,5 @@
 package http.service;
 
-
-import http.config.SmartHomeTechTopics;
 import http.kafka.CollectorClient;
 import http.mapper.HubEventAvroMapper;
 import http.mapper.SensorEventAvroMapper;
@@ -10,6 +8,7 @@ import http.model.hub.HubEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
@@ -18,13 +17,13 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 @Service
 @RequiredArgsConstructor
 public class SmartHomeServiceKafkaImpl implements SmartHomeTechService {
-
+    private final Environment env;
     private final CollectorClient collectorClient;
 
     @Override
     public void sendToQueue(HubEvent event) {
         collectorClient.getProducer().send(
-                new ProducerRecord<>(SmartHomeTechTopics.TELEMETRY_HUBS_V1, null, eventToAvro(event))
+                new ProducerRecord<>(env.getProperty("kafka.topics.hub-events"), null, eventToAvro(event))
         );
         log.info("Sent to queue with event {}", eventToAvro(event));
     }
@@ -32,7 +31,7 @@ public class SmartHomeServiceKafkaImpl implements SmartHomeTechService {
     @Override
     public void sendToQueue(SensorEvent event) {
         collectorClient.getProducer().send(
-                new ProducerRecord<>(SmartHomeTechTopics.TELEMETRY_SENSORS_V1, null, eventToAvro(event))
+                new ProducerRecord<>(env.getProperty("kafka.topics.sensor-events"), null, eventToAvro(event))
         );
         log.info("Sent to queue with event {}", eventToAvro(event));
     }

@@ -2,19 +2,22 @@ package http.config;
 
 import http.kafka.CollectorClient;
 import http.kafka.SmartHomeTechAvroSerializer;
+import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.VoidSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 
 import java.util.Properties;
 
 @Configuration
+@RequiredArgsConstructor
 public class KafkaCollectorClientConfiguration {
+    private final Environment env;
 
     @Scope("prototype")
     @Bean
@@ -32,8 +35,8 @@ public class KafkaCollectorClientConfiguration {
 
             private void initProducer() {
                 Properties props = new Properties();
-                props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-                props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, VoidSerializer.class.getName());
+                props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.properties.bootstrap.servers"));
+                props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, env.getProperty("spring.kafka.properties.key.serializer"));
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, SmartHomeTechAvroSerializer.class.getName());
 
                 producer = new KafkaProducer<>(props);
