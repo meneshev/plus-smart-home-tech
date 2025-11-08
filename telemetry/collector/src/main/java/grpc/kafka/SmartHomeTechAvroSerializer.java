@@ -1,4 +1,4 @@
-package http.kafka;
+package grpc.kafka;
 
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DatumWriter;

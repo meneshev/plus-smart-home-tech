@@ -1,4 +1,4 @@
-package http.error;
+package grpc.error;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
