@@ -1,7 +1,7 @@
 package grpc.controller;
 
 import com.google.protobuf.Empty;
-import grpc.service.SmartHomeTechService;
+import grpc.service.CollectorService;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -16,7 +16,7 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 @GrpcService
 @RequiredArgsConstructor
 public class EventController extends CollectorControllerGrpc.CollectorControllerImplBase {
-    private final SmartHomeTechService smartHomeTechService;
+    private final CollectorService smartHomeTechService;
 
     @Override
     public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {

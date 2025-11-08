@@ -1,10 +1,6 @@
-grpc:
-  server:
-    port: 59091
-
 spring:
   application:
-    name: collector
+    name: aggregator
   main:
     log-startup-info: false
     banner-mode: off
