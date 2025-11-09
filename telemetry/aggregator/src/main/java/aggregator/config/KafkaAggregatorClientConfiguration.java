@@ -2,7 +2,7 @@ package aggregator.config;
 
 import aggregator.kafka.AggregatorClient;
 import aggregator.kafka.SensorEventDeserializer;
-import grpc.kafka.SmartHomeTechAvroSerializer;
+import collector.kafka.SmartHomeTechAvroSerializer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

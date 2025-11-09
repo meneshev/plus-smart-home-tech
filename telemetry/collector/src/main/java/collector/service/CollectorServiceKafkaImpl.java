@@ -1,8 +1,8 @@
-package grpc.service;
+package collector.service;
 
-import grpc.kafka.CollectorClient;
-import grpc.mapper.HubEventAvroMapper;
-import grpc.mapper.SensorEventAvroMapper;
+import collector.kafka.CollectorClient;
+import collector.mapper.HubEventAvroMapper;
+import collector.mapper.SensorEventAvroMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;

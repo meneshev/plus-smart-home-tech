@@ -1,7 +1,7 @@
-package grpc.config;
+package collector.config;
 
-import grpc.kafka.CollectorClient;
-import grpc.kafka.SmartHomeTechAvroSerializer;
+import collector.kafka.CollectorClient;
+import collector.kafka.SmartHomeTechAvroSerializer;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.KafkaProducer;

@@ -1,7 +1,7 @@
-package grpc.controller;
+package collector.controller;
 
 import com.google.protobuf.Empty;
-import grpc.service.CollectorService;
+import collector.service.CollectorService;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
