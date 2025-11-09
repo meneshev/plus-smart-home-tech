@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>ru.yandex.practicum</groupId>
-            <artifactId>collector</artifactId>
+            <artifactId>telemetry-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -41,8 +41,6 @@
             <version>1.18.38</version>
         </dependency>
     </dependencies>
-
-    <packaging>jar</packaging>
 
     <build>
         <plugins>

@@ -1,4 +1,4 @@
-package collector.kafka;
+package kafka;
 
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DatumWriter;

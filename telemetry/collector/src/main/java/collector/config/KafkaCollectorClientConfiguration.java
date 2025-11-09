@@ -1,7 +1,7 @@
 package collector.config;
 
 import collector.kafka.CollectorClient;
-import collector.kafka.SmartHomeTechAvroSerializer;
+import kafka.SmartHomeTechAvroSerializer;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.KafkaProducer;

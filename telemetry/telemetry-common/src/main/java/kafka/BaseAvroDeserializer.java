@@ -1,4 +1,4 @@
-package aggregator.kafka;
+package kafka;
 
 import org.apache.avro.Schema;
 import org.apache.avro.io.BinaryDecoder;

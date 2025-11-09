@@ -1,4 +1,4 @@
-package aggregator.kafka;
+package kafka;
 
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 
