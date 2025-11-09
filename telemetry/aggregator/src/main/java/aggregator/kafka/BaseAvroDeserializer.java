@@ -20,7 +20,7 @@ public class BaseAvroDeserializer<T extends SpecificRecordBase> implements Deser
     }
 
     @Override
-    public T deserialize(String s, byte[] bytes) {
+    public T deserialize(String topic, byte[] bytes) {
         try (ByteArrayInputStream in = new ByteArrayInputStream(bytes)) {
             BinaryDecoder decoder = decoderFactory.binaryDecoder(in, null);
             DatumReader<T> datumReader = new SpecificDatumReader<>(schema);

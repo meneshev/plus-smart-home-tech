@@ -1,3 +1,6 @@
+server:
+  port: 9094
+
 spring:
   application:
     name: aggregator
@@ -8,6 +11,11 @@ spring:
     properties:
       bootstrap.servers: "localhost:9092"
       key.serializer: "org.apache.kafka.common.serialization.VoidSerializer"
+      key.deserializer: "org.apache.kafka.common.serialization.VoidDeserializer"
+      consumer:
+        auto-commit: "false"
+      producer:
+        linger-ms: 5
 
 kafka:
   topics:

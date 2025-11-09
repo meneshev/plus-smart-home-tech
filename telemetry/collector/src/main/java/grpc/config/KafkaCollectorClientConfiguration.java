@@ -38,7 +38,7 @@ public class KafkaCollectorClientConfiguration {
                 props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.properties.bootstrap.servers"));
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, env.getProperty("spring.kafka.properties.key.serializer"));
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, SmartHomeTechAvroSerializer.class.getName());
-
+                props.put(ProducerConfig.LINGER_MS_CONFIG, env.getProperty("spring.kafka.properties.producer.linger-ms"));
                 producer = new KafkaProducer<>(props);
             }
 
