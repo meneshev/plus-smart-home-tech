@@ -1,8 +1,8 @@
-package grpc.service;
+package collector.service;
 
-import grpc.kafka.CollectorClient;
-import grpc.mapper.HubEventAvroMapper;
-import grpc.mapper.SensorEventAvroMapper;
+import collector.kafka.CollectorClient;
+import collector.mapper.HubEventAvroMapper;
+import collector.mapper.SensorEventAvroMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -16,13 +16,13 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SmartHomeServiceKafkaImpl implements SmartHomeTechService {
+public class CollectorServiceKafkaImpl implements CollectorService {
     private final Environment env;
-    private final CollectorClient collectorClient;
+    private final CollectorClient client;
 
     @Override
     public void sendToQueue(HubEventProto event) {
-        collectorClient.getProducer().send(
+        client.getProducer().send(
                 new ProducerRecord<>(env.getProperty("kafka.topics.hub-events"), null, eventToAvro(event))
         );
         log.info("Sent to queue with event {}", eventToAvro(event));
@@ -30,7 +30,7 @@ public class SmartHomeServiceKafkaImpl implements SmartHomeTechService {
 
     @Override
     public void sendToQueue(SensorEventProto event) {
-        collectorClient.getProducer().send(
+        client.getProducer().send(
                 new ProducerRecord<>(env.getProperty("kafka.topics.sensor-events"), null, eventToAvro(event))
         );
         log.info("Sent to queue with event {}", eventToAvro(event));

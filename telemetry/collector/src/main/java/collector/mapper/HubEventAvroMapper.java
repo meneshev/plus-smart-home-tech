@@ -1,4 +1,4 @@
-package grpc.mapper;
+package collector.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

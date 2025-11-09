@@ -1,4 +1,4 @@
-package grpc.error;
+package collector.error;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
