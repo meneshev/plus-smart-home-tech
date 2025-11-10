@@ -1,0 +1,36 @@
+server:
+  port: 9095
+
+grpc:
+  client:
+    hub-router:
+      address: "static://localhost:59090"
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+spring:
+  application:
+    name: analyzer
+  main:
+    log-startup-info: false
+    banner-mode: off
+  kafka:
+    properties:
+      bootstrap.servers: "localhost:9092"
+      key.deserializer: "org.apache.kafka.common.serialization.VoidDeserializer"
+      consumer:
+        auto-commit: "false"
+
+kafka:
+  topics:
+    hub-events: "telemetry.hubs.v1"
+    events-snapshots: "telemetry.snapshots.v1"
+  groups:
+    analyzer-hub: "analyzer-hub-group"
+    analyzer-snapshot: "analyzer-snapshot-group"
+
+logging:
+  level:
+    org.springframework.context: ERROR
+    org.apache.kafka: ERROR
