@@ -21,6 +21,13 @@ spring:
       key.deserializer: "org.apache.kafka.common.serialization.VoidDeserializer"
       consumer:
         auto-commit: "false"
+  sql:
+    init-mode: always
+  datasource:
+    url: jdbc:postgresql://localhost:5434/telemetry_analyzer
+    driverClassName: org.postgresql.Driver
+    username: analyzer.user
+    password: 12345
 
 kafka:
   topics:
@@ -32,5 +39,11 @@ kafka:
 
 logging:
   level:
-    org.springframework.context: ERROR
-    org.apache.kafka: ERROR
+    org:
+      springframework:
+        context: ERROR
+        jdbc: DEBUG
+      hibernate:
+        SQL: DEBUG
+      apache.kafka: ERROR
+    root: INFO

@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
+//todo ConfigurationPropertiesScan для работы с ConfigurationProperties
 public class Analyzer {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Analyzer.class, args);
@@ -18,6 +19,6 @@ public class Analyzer {
         hubEventsThread.setName("HubEventHandlerThread");
         hubEventsThread.start();
 
-        snapshotProcessor.run();
+        snapshotProcessor.start();
     }
 }

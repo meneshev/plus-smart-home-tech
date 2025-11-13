@@ -34,7 +34,6 @@ public class SnapshotProcessor implements Runnable {
         try {
             while (true) {
 
-
             }
         } catch (WakeupException ignored) {
 
@@ -53,6 +52,7 @@ public class SnapshotProcessor implements Runnable {
     private void processRecords(ConsumerRecords<Void, SensorsSnapshotAvro> events) {
         int recordsConsumed = 0;
         List<HubEventAvro> hubEvents = new ArrayList<>();
+        // коммит только после успешной отправки действия (или сохранения)
 
     }
 }

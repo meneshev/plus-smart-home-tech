@@ -18,5 +18,7 @@ public class HubRouterActionsSender {
     @Scheduled(initialDelay = 1000, fixedDelay = 1000)
     public void sendAction() {
         log.info("Sending action: {}", new Object());
+
+        // обработать ошибки через exception
     }
 }
