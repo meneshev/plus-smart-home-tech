@@ -1,13 +1,13 @@
 package analyzer.dal.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@Builder
 @Entity
 @Table(name = "conditions")
 public class Condition {

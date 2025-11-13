@@ -1,13 +1,13 @@
 package analyzer.dal.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@Builder
 @Entity
 @Table(name = "actions")
 public class Action {
@@ -18,5 +18,5 @@ public class Action {
     @Column(nullable = false)
     private String type;
 
-    private String value;
+    private Integer value;
 }

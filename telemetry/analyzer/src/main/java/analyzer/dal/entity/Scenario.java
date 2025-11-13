@@ -1,8 +1,8 @@
 package analyzer.dal.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@Builder
 @Entity
 @Table(name = "scenarios")
 public class Scenario {
@@ -23,8 +23,6 @@ public class Scenario {
 
     @Column(nullable = false)
     private String name;
-
-    //TODO something thing from lesson
 
     @OneToMany
     @MapKeyColumn(table = "scenario_conditions", name = "sensor_id")
