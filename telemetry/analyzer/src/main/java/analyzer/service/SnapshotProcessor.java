@@ -3,19 +3,17 @@ package analyzer.service;
 import analyzer.kafka.AnalyzerClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -33,7 +31,8 @@ public class SnapshotProcessor implements Runnable {
         Runtime.getRuntime().addShutdownHook(new Thread(client.getHubConsumer()::wakeup));
         try {
             while (true) {
-
+                log.info("Getting snapshots...");
+                processRecords(client.getSnapshotConsumer().poll(CONSUMER_TIMEOUT));
             }
         } catch (WakeupException ignored) {
 
@@ -49,9 +48,11 @@ public class SnapshotProcessor implements Runnable {
         }
     }
 
-    private void processRecords(ConsumerRecords<Void, SensorsSnapshotAvro> events) {
-        int recordsConsumed = 0;
-        List<HubEventAvro> hubEvents = new ArrayList<>();
+    private void processRecords(ConsumerRecords<Void, SensorsSnapshotAvro> snapshots) {
+        for (ConsumerRecord<Void, SensorsSnapshotAvro> snapshot : snapshots) {
+            log.info("Processing record - topic:[{}] partition:[{}] offset:[{}] value: {}",
+                    snapshot.topic(), snapshot.partition(), snapshot.offset(), snapshot.value());
+        }
         // коммит только после успешной отправки действия (или сохранения)
 
     }

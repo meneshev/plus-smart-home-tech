@@ -6,7 +6,7 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 public interface AnalyzerClient {
     Consumer<Void, HubEventAvro> getHubConsumer();
-
+//TODO разделить на два класса
     Consumer<Void, SensorsSnapshotAvro> getSnapshotConsumer();
 
     void stop();

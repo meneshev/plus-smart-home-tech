@@ -16,7 +16,6 @@ import ru.yandex.practicum.kafka.telemetry.event.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,22 +26,21 @@ public class HubDBService {
     private final ScenarioRepository scenarioRepository;
     private final SensorRepository sensorRepository;
 
-    public void processHubEvent(HubEventAvro eventAvro) {
+    public boolean processHubEvent(HubEventAvro eventAvro) {
+        boolean isSuccess;
         try {
             switch (eventAvro.getPayload()) {
                 case DeviceAddedEventAvro deviceAdded -> {
-                    handleDeviceAdded(eventAvro);
+                    isSuccess = handleDeviceAdded(eventAvro);
                 }
                 case DeviceRemovedEventAvro deviceRemoved -> {
-                    handleDeviceRemoved(eventAvro);
+                    isSuccess = handleDeviceRemoved(eventAvro);
                 }
                 case ScenarioAddedEventAvro scenarioAdded -> {
-                    handleScenarioAdded(eventAvro);
-                    return true;
+                    isSuccess = handleScenarioAdded(eventAvro);
                 }
                 case ScenarioRemovedEventAvro scenarioRemoved -> {
-                    handleScenarioRemoved(eventAvro);
-                    return true;
+                    isSuccess = handleScenarioRemoved(eventAvro);
                 }
                 default -> {
                     log.error("Unknown payload type: {}", eventAvro.getPayload());
@@ -51,11 +49,12 @@ public class HubDBService {
             }
         } catch (Exception e) {
             log.error("Exception during process Hub Event: {}", e.getMessage());
-            return false;
+            isSuccess = false;
         }
+        return isSuccess;
     }
 
-    private void handleDeviceAdded(HubEventAvro eventAvro) {
+    private boolean handleDeviceAdded(HubEventAvro eventAvro) {
         DeviceAddedEventAvro addedEvent = (DeviceAddedEventAvro) eventAvro.getPayload();
         if (sensorRepository.existsByIdAndHubId(List.of(addedEvent.getId()), eventAvro.getHubId())) {
             throw new RuntimeException(String.format("Sensor: %s already exists", eventAvro));
@@ -68,9 +67,10 @@ public class HubDBService {
 
         newSensor = sensorRepository.save(newSensor);
         log.info("New sensor: {} was saved to database", newSensor);
+        return true;
     }
 
-    private void handleDeviceRemoved(HubEventAvro eventAvro) {
+    private boolean handleDeviceRemoved(HubEventAvro eventAvro) {
         DeviceRemovedEventAvro removedEvent = (DeviceRemovedEventAvro) eventAvro.getPayload();
         if (!sensorRepository.existsByIdAndHubId(List.of(removedEvent.getId()), eventAvro.getHubId())) {
             throw new RuntimeException(String.format("Sensor: %s is no exists", eventAvro));
@@ -90,9 +90,11 @@ public class HubDBService {
                 .build();
         sensorRepository.delete(sensorToDelete);
         log.info("Sensor: {} was deleted", sensorToDelete);
+
+        return true;
     }
 
-    private void handleScenarioAdded(HubEventAvro eventAvro) {
+    private boolean handleScenarioAdded(HubEventAvro eventAvro) {
         ScenarioAddedEventAvro addedEvent = (ScenarioAddedEventAvro) eventAvro.getPayload();
         if (scenarioRepository.findByHubIdAndName(eventAvro.getHubId(), addedEvent.getName()).isPresent()) {
             throw new RuntimeException(String.format("Scenario: %s is already exists", eventAvro));
@@ -160,7 +162,7 @@ public class HubDBService {
 
                             newAct = actionRepository.save(newAct);
 
-                            map.put(actionAvro.getSensorId(), newAct)
+                            map.put(actionAvro.getSensorId(), newAct);
                         },
                         Map::putAll
                 );
@@ -174,10 +176,23 @@ public class HubDBService {
 
         newScenario = scenarioRepository.save(newScenario);
         log.info("New scenario: {} was saved to database", newScenario);
+
+        return true;
     }
 
-    private void handleScenarioRemoved(HubEventAvro eventAvro) {
+    private boolean handleScenarioRemoved(HubEventAvro eventAvro) {
+        ScenarioRemovedEventAvro scenarioRemoved = (ScenarioRemovedEventAvro) eventAvro.getPayload();
+        if (scenarioRepository.findByHubIdAndName(eventAvro.getHubId(), scenarioRemoved.getName()).isEmpty()) {
+            throw new RuntimeException(String.format("Scenario: %s is not  exists", eventAvro));
+        }
 
+        scenarioRepository.findByHubIdAndName(eventAvro.getHubId(), scenarioRemoved.getName()).stream()
+                        .forEach(scenario -> {
+                            scenario.getConditions().clear();
+                            scenario.getActions().clear();
+                            scenarioRepository.delete(scenario);
+                        });
+
+        return true;
     }
-
 }
