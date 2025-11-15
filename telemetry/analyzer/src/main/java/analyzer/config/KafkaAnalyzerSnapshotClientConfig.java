@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -18,19 +17,18 @@ import java.util.Properties;
 
 @Configuration
 @RequiredArgsConstructor
-@ConfigurationProperties("kafka")
 public class KafkaAnalyzerSnapshotClientConfig {
     private final Environment env;
 
     @Scope("prototype")
     @Bean
-    AnalyzerSnapshotClient kafkaAnalyzerClient() {
+    AnalyzerSnapshotClient kafkaAnalyzerSnapshotClient() {
         return new AnalyzerSnapshotClient() {
             private Consumer<Void, SensorsSnapshotAvro> consumer;
 
             @Override
             public Consumer<Void, SensorsSnapshotAvro> getConsumer() {
-                if (consumer != null) {
+                if (consumer == null) {
                     initSnapshotConsumer();
                 }
 

@@ -1,9 +1,7 @@
 package analyzer.dal.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
 
 @Getter
@@ -11,6 +9,8 @@ import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
 @Builder
 @Entity
 @Table(name = "actions")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Action {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

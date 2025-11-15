@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -18,19 +17,18 @@ import java.util.Properties;
 
 @Configuration
 @RequiredArgsConstructor
-@ConfigurationProperties("kafka")
 public class KafkaAnalyzerHubClientConfig {
     private final Environment env;
 
     @Scope("prototype")
     @Bean
-    AnalyzerHubClient kafkaAnalyzerClient() {
+    AnalyzerHubClient kafkaAnalyzerHubClient() {
         return new AnalyzerHubClient() {
             private Consumer<Void, HubEventAvro> hubConsumer;
 
             @Override
             public Consumer<Void, HubEventAvro> getConsumer() {
-                if (hubConsumer != null) {
+                if (hubConsumer == null) {
                     initHubConsumer();
                 }
 

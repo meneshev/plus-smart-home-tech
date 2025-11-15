@@ -11,6 +11,8 @@ import com.google.protobuf.Timestamp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
@@ -26,65 +28,67 @@ public class SnapshotAnalyzer {
     private final ScenarioRepository scenarioRepository;
     private final HubRouterActionsSender actionsSender;
 
+    @Transactional(readOnly = true)
     public boolean processSnapshot(SensorsSnapshotAvro snapshot) {
         boolean isSuccessfulProcessed = false;
         try {
             List<Scenario> hubScenarios = scenarioRepository.findByHubId(snapshot.getHubId());
-            if (!hubScenarios.isEmpty()) {
-                snapshot.getSensorState().forEach((sensorId, sensorState) -> {
-                    hubScenarios.stream()
-                            .filter(scenario -> (scenario.getConditions().get(sensorId) != null
-                                    && scenario.getConditions().get(sensorId).getValue() != null)
-                                        && scenario.getActions().get(sensorId) != null)
-                            .forEach(
-                            scenario -> {
-                                Condition condition = scenario.getConditions().get(sensorId);
 
-                                boolean isConditionPassed;
-                                switch (sensorState.getData()) {
-                                    case ClimateSensorAvro sensor -> isConditionPassed = processClimateSensor(sensor, condition);
-                                    case TemperatureSensorAvro sensor -> isConditionPassed = processTemperatureSensor(sensor, condition);
-                                    case LightSensorAvro sensor -> isConditionPassed = processLightSensor(sensor, condition);
-                                    case MotionSensorAvro sensor -> isConditionPassed = processMotionSensor(sensor, condition);
-                                    case SwitchSensorAvro sensor -> isConditionPassed = processSwitchSensor(sensor, condition);
-                                    default -> throw new NonConsistentDataException(
-                                            String.format("Unexpected sensor state type: %s",
-                                                    sensorState.getData().getClass())
-                                    );
-                                }
+            hubScenarios.forEach(sc -> {
+                boolean allConditionsPassed = hubScenarios.stream()
+                        .allMatch(scenario -> snapshot.getSensorState().entrySet().stream()
+                                .filter(entry -> {
+                                    Condition condition = scenario.getConditions().get(entry.getKey());
+                                    return condition != null && condition.getValue() != null;
+                                })
+                                .allMatch(entry -> {
+                                    SensorStateAvro sensorState = entry.getValue();
+                                    Condition condition = scenario.getConditions().get(entry.getKey());
 
-                                if (isConditionPassed) {
-                                    Action action = scenario.getActions().get(sensorId);
-                                    DeviceActionRequest actionRequest;
+                                    return switch (sensorState.getData()) {
+                                        case ClimateSensorAvro sensor -> processClimateSensor(sensor, condition);
+                                        case TemperatureSensorAvro sensor -> processTemperatureSensor(sensor, condition);
+                                        case LightSensorAvro sensor -> processLightSensor(sensor, condition);
+                                        case MotionSensorAvro sensor -> processMotionSensor(sensor, condition);
+                                        case SwitchSensorAvro sensor -> processSwitchSensor(sensor, condition);
+                                        default -> throw new NonConsistentDataException(
+                                                String.format("Unexpected sensor state type: %s",
+                                                        sensorState.getData().getClass())
+                                        );
+                                    };
+                                })
+                        );
 
-                                    DeviceActionProto.Builder actionBuilder = DeviceActionProto.newBuilder()
-                                            .setSensorId(sensorId)
-                                            .setType(ActionTypeProto.valueOf(action.getType().name()));
+                if (allConditionsPassed) {
+                    sc.getActions().forEach((sensorId, action) -> {
+                        DeviceActionRequest actionRequest;
 
-                                    if (action.getValue() != null) {
-                                        actionBuilder.setValue(action.getValue());
-                                    }
+                        DeviceActionProto.Builder actionBuilder = DeviceActionProto.newBuilder()
+                                .setSensorId(sensorId)
+                                .setType(ActionTypeProto.valueOf(action.getType().name()));
 
-                                    Instant now = Instant.now();
+                        if (action.getValue() != null) {
+                            actionBuilder.setValue(action.getValue());
+                        }
 
-                                    actionRequest = DeviceActionRequest.newBuilder()
-                                            .setHubId(snapshot.getHubId())
-                                            .setScenarioName(scenario.getName())
-                                            .setAction(actionBuilder.build())
-                                            .setTimestamp(Timestamp.newBuilder()
-                                                    .setSeconds(now.getEpochSecond())
-                                                    .setNanos(now.getNano())
-                                                    .build()
-                                            )
-                                            .build();
+                        Instant now = Instant.now();
 
-                                    actionsSender.sendAction(actionRequest);
-                                }
-                            }
-                    );
-                });
-                isSuccessfulProcessed = true;
-            }
+                        actionRequest = DeviceActionRequest.newBuilder()
+                                .setHubId(snapshot.getHubId())
+                                .setScenarioName(sc.getName())
+                                .setAction(actionBuilder.build())
+                                .setTimestamp(Timestamp.newBuilder()
+                                        .setSeconds(now.getEpochSecond())
+                                        .setNanos(now.getNano())
+                                        .build()
+                                )
+                                .build();
+
+                        actionsSender.sendAction(actionRequest);
+                    });
+                }
+            });
+            isSuccessfulProcessed = true;
         } catch (NonConsistentDataException e ) {
             log.error("Non consistent data during process Hub Event: {}", e.getMessage());
             return isSuccessfulProcessed = true;

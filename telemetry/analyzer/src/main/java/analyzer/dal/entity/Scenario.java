@@ -1,9 +1,7 @@
 package analyzer.dal.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +9,11 @@ import java.util.Map;
 @Getter
 @Setter
 @Builder
+@ToString
 @Entity
 @Table(name = "scenarios")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Scenario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +37,7 @@ public class Scenario {
     @OneToMany
     @MapKeyColumn(table = "scenario-actions", name = "sensor_id")
     @JoinTable(
-            name = "scenaio_actions",
+            name = "scenraio_actions",
             joinColumns = @JoinColumn(name = "scenario_id"),
             inverseJoinColumns = @JoinColumn(name = "action_id")
     )

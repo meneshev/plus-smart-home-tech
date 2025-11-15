@@ -9,15 +9,16 @@ import analyzer.dal.repository.SensorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class HubDBService {
     private final ActionRepository actionRepository;
     private final ConditionRepository conditionRepository;
@@ -49,7 +50,7 @@ public class HubDBService {
 
     private void handleDeviceAdded(HubEventAvro eventAvro) {
         DeviceAddedEventAvro addedEvent = (DeviceAddedEventAvro) eventAvro.getPayload();
-        if (sensorRepository.existsByIdAndHubId(List.of(addedEvent.getId()), eventAvro.getHubId())) {
+        if (sensorRepository.existsByIdAndHubId(addedEvent.getId(), eventAvro.getHubId())) {
             throw new NonConsistentDataException(String.format("Sensor: %s already exists", eventAvro));
         }
 
@@ -64,7 +65,7 @@ public class HubDBService {
 
     private void handleDeviceRemoved(HubEventAvro eventAvro) {
         DeviceRemovedEventAvro removedEvent = (DeviceRemovedEventAvro) eventAvro.getPayload();
-        if (!sensorRepository.existsByIdAndHubId(List.of(removedEvent.getId()), eventAvro.getHubId())) {
+        if (!sensorRepository.existsByIdAndHubId(removedEvent.getId(), eventAvro.getHubId())) {
             throw new NonConsistentDataException(String.format("Sensor: %s is no exists", eventAvro));
         }
         scenarioRepository.findByHubId(eventAvro.getHubId()).stream()
@@ -100,7 +101,11 @@ public class HubDBService {
                                     .build();
 
                             if (conditionAvro.getValue() != null) {
-                                newCnd.setValue((Integer) conditionAvro.getValue());
+                                Integer value = switch (newCnd.getType()) {
+                                    case MOTION, SWITCH -> conditionAvro.getValue().equals(true) ? 1 : 0;
+                                    default -> (Integer) conditionAvro.getValue();
+                                };
+                                newCnd.setValue(value);
                             }
 
                             newCnd = conditionRepository.save(newCnd);

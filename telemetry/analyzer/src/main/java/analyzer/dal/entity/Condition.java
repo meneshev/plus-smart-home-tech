@@ -1,14 +1,14 @@
 package analyzer.dal.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 
 @Getter @Setter @Builder
 @Entity
 @Table(name = "conditions")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Condition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

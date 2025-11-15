@@ -7,6 +7,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface SensorRepository extends JpaRepository<Sensor, String> {
-    boolean existsByIdAndHubId(Collection<String> ids, String hubId);
+    boolean existsByIdAndHubId(String id, String hubId);
     Optional<Sensor> findByIdAndHubId(String id, String hubId);
 }
