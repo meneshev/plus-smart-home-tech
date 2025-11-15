@@ -5,6 +5,7 @@ import analyzer.dal.entity.Action;
 import analyzer.dal.entity.Condition;
 import analyzer.dal.entity.ConditionOperation;
 import analyzer.dal.entity.Scenario;
+import analyzer.dal.exception.NonConsistentDataException;
 import analyzer.dal.repository.ScenarioRepository;
 import com.google.protobuf.Timestamp;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class SnapshotAnalyzer {
                                     case LightSensorAvro sensor -> isConditionPassed = processLightSensor(sensor, condition);
                                     case MotionSensorAvro sensor -> isConditionPassed = processMotionSensor(sensor, condition);
                                     case SwitchSensorAvro sensor -> isConditionPassed = processSwitchSensor(sensor, condition);
-                                    default -> throw new RuntimeException(
+                                    default -> throw new NonConsistentDataException(
                                             String.format("Unexpected sensor state type: %s",
                                                     sensorState.getData().getClass())
                                     );
@@ -84,6 +85,9 @@ public class SnapshotAnalyzer {
                 });
                 isSuccessfulProcessed = true;
             }
+        } catch (NonConsistentDataException e ) {
+            log.error("Non consistent data during process Hub Event: {}", e.getMessage());
+            return isSuccessfulProcessed = true;
         } catch (Exception e) {
             log.error("Error during snapshot processing: ", e);
             return isSuccessfulProcessed;
@@ -97,7 +101,7 @@ public class SnapshotAnalyzer {
             case CO2LEVEL -> valueToCheck = sensorState.getCo2Level();
             case TEMPERATURE -> valueToCheck = sensorState.getTemperatureC();
             case HUMIDITY -> valueToCheck = sensorState.getHumidity();
-            default -> throw new RuntimeException(
+            default -> throw new NonConsistentDataException(
                     String.format("Incorrect condition type: %s for sensor: %s",
                             condition.getType(), sensorState.getClass())
             );
@@ -109,7 +113,7 @@ public class SnapshotAnalyzer {
         int valueToCheck;
         switch (condition.getType()) {
             case TEMPERATURE -> valueToCheck = sensorState.getTemperatureC();
-            default -> throw new RuntimeException(
+            default -> throw new NonConsistentDataException(
                     String.format("Incorrect condition type: %s for sensor: %s",
                             condition.getType(), sensorState.getClass())
             );
@@ -121,7 +125,7 @@ public class SnapshotAnalyzer {
         int valueToCheck;
         switch (condition.getType()) {
             case LUMINOSITY -> valueToCheck = sensorState.getLuminosity();
-            default -> throw new RuntimeException(
+            default -> throw new NonConsistentDataException(
                     String.format("Incorrect condition type: %s for sensor: %s",
                             condition.getType(), sensorState.getClass())
             );
@@ -134,7 +138,7 @@ public class SnapshotAnalyzer {
             case MOTION -> {
                 return checkBoolCondition(condition.getValue(), sensorState.getMotion());
             }
-            default -> throw new RuntimeException(
+            default -> throw new NonConsistentDataException(
                     String.format("Incorrect condition type: %s for sensor: %s",
                             condition.getType(), sensorState.getClass())
             );
@@ -146,7 +150,7 @@ public class SnapshotAnalyzer {
             case SWITCH -> {
                 return checkBoolCondition(condition.getValue(), sensorState.getState());
             }
-            default -> throw new RuntimeException(
+            default -> throw new NonConsistentDataException(
                     String.format("Incorrect condition type: %s for sensor: %s",
                             condition.getType(), sensorState.getClass())
             );
@@ -164,7 +168,7 @@ public class SnapshotAnalyzer {
             case LOWER_THAN -> {
                 return currentValue < conditionValue;
             }
-            default -> throw new RuntimeException(String.format("Unexpected condition operation: %s", operation));
+            default -> throw new NonConsistentDataException(String.format("Unexpected condition operation: %s", operation));
         }
     }
 
@@ -175,7 +179,7 @@ public class SnapshotAnalyzer {
         } else if (conditionValue == 1) {
             conditionBool = true;
         } else {
-            throw new RuntimeException(String.format("Can't convert %d to bool value", conditionValue));
+            throw new NonConsistentDataException(String.format("Can't convert %d to bool value", conditionValue));
         }
         return conditionBool == currentValue;
     }

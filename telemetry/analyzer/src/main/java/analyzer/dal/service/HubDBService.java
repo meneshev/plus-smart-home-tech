@@ -1,6 +1,7 @@
 package analyzer.dal.service;
 
 import analyzer.dal.entity.*;
+import analyzer.dal.exception.NonConsistentDataException;
 import analyzer.dal.repository.ActionRepository;
 import analyzer.dal.repository.ConditionRepository;
 import analyzer.dal.repository.ScenarioRepository;
@@ -24,37 +25,32 @@ public class HubDBService {
     private final SensorRepository sensorRepository;
 
     public boolean processHubEvent(HubEventAvro eventAvro) {
-        boolean isSuccess;
+        boolean isRecordProcessed = false;
         try {
             switch (eventAvro.getPayload()) {
-                case DeviceAddedEventAvro deviceAdded -> {
-                    isSuccess = handleDeviceAdded(eventAvro);
-                }
-                case DeviceRemovedEventAvro deviceRemoved -> {
-                    isSuccess = handleDeviceRemoved(eventAvro);
-                }
-                case ScenarioAddedEventAvro scenarioAdded -> {
-                    isSuccess = handleScenarioAdded(eventAvro);
-                }
-                case ScenarioRemovedEventAvro scenarioRemoved -> {
-                    isSuccess = handleScenarioRemoved(eventAvro);
-                }
+                case DeviceAddedEventAvro deviceAdded -> handleDeviceAdded(eventAvro);
+                case DeviceRemovedEventAvro deviceRemoved -> handleDeviceRemoved(eventAvro);
+                case ScenarioAddedEventAvro scenarioAdded -> handleScenarioAdded(eventAvro);
+                case ScenarioRemovedEventAvro scenarioRemoved -> handleScenarioRemoved(eventAvro);
                 default -> {
                     log.error("Unknown payload type: {}", eventAvro.getPayload());
                     throw new RuntimeException("Unknown payload type");
                 }
             }
+        } catch (NonConsistentDataException e) {
+            log.error("Non consistent data during process Hub Event: {}", e.getMessage());
+            return isRecordProcessed = true;
         } catch (Exception e) {
             log.error("Exception during process Hub Event: {}", e.getMessage());
-            isSuccess = false;
+            return isRecordProcessed;
         }
-        return isSuccess;
+        return isRecordProcessed = true;
     }
 
-    private boolean handleDeviceAdded(HubEventAvro eventAvro) {
+    private void handleDeviceAdded(HubEventAvro eventAvro) {
         DeviceAddedEventAvro addedEvent = (DeviceAddedEventAvro) eventAvro.getPayload();
         if (sensorRepository.existsByIdAndHubId(List.of(addedEvent.getId()), eventAvro.getHubId())) {
-            throw new RuntimeException(String.format("Sensor: %s already exists", eventAvro));
+            throw new NonConsistentDataException(String.format("Sensor: %s already exists", eventAvro));
         }
 
         Sensor newSensor = Sensor.builder()
@@ -64,13 +60,12 @@ public class HubDBService {
 
         newSensor = sensorRepository.save(newSensor);
         log.info("New sensor: {} was saved to database", newSensor);
-        return true;
     }
 
-    private boolean handleDeviceRemoved(HubEventAvro eventAvro) {
+    private void handleDeviceRemoved(HubEventAvro eventAvro) {
         DeviceRemovedEventAvro removedEvent = (DeviceRemovedEventAvro) eventAvro.getPayload();
         if (!sensorRepository.existsByIdAndHubId(List.of(removedEvent.getId()), eventAvro.getHubId())) {
-            throw new RuntimeException(String.format("Sensor: %s is no exists", eventAvro));
+            throw new NonConsistentDataException(String.format("Sensor: %s is no exists", eventAvro));
         }
         scenarioRepository.findByHubId(eventAvro.getHubId()).stream()
                 .filter(scenario -> scenario.getConditions().containsKey(removedEvent.getId())
@@ -87,30 +82,13 @@ public class HubDBService {
                 .build();
         sensorRepository.delete(sensorToDelete);
         log.info("Sensor: {} was deleted", sensorToDelete);
-
-        return true;
     }
 
-    private boolean handleScenarioAdded(HubEventAvro eventAvro) {
+    private void handleScenarioAdded(HubEventAvro eventAvro) {
         ScenarioAddedEventAvro addedEvent = (ScenarioAddedEventAvro) eventAvro.getPayload();
         if (scenarioRepository.findByHubIdAndName(eventAvro.getHubId(), addedEvent.getName()).isPresent()) {
-            throw new RuntimeException(String.format("Scenario: %s is already exists", eventAvro));
+            throw new NonConsistentDataException(String.format("Scenario: %s is already exists", eventAvro));
         }
-
-//        Map<String, Condition> newConditions = addedEvent.getConditions().stream()
-//                .map(condition -> {
-//                    Condition newCnd = Condition.builder()
-//                            .type(condition.getType().name())
-//                            .operation(condition.getOperation().name())
-//                            .build();
-//
-//                    if (condition.getValue() != null) {
-//                        newCnd.setValue((Integer) condition.getValue());
-//                    }
-//
-//                    return conditionRepository.save(newCnd);
-//                })
-//                .collect(Collectors.toMap());
 
         Map<String, Condition> newConditions = addedEvent.getConditions().stream()
                 .collect(
@@ -131,20 +109,6 @@ public class HubDBService {
                         },
                         Map::putAll
                 );
-
-//        List<Action> newActions = addedEvent.getActions().stream()
-//                .map(action -> {
-//                    Action newAct = Action.builder()
-//                            .type(action.getType().name())
-//                            .build();
-//
-//                    if (action.getValue() != null) {
-//                        newAct.setValue(action.getValue());
-//                    }
-//
-//                    return actionRepository.save(newAct);
-//                })
-//                .toList();
 
         Map<String, Action> newActions = addedEvent.getActions().stream()
                 .collect(HashMap::new,
@@ -173,14 +137,12 @@ public class HubDBService {
 
         newScenario = scenarioRepository.save(newScenario);
         log.info("New scenario: {} was saved to database", newScenario);
-
-        return true;
     }
 
-    private boolean handleScenarioRemoved(HubEventAvro eventAvro) {
+    private void handleScenarioRemoved(HubEventAvro eventAvro) {
         ScenarioRemovedEventAvro scenarioRemoved = (ScenarioRemovedEventAvro) eventAvro.getPayload();
         if (scenarioRepository.findByHubIdAndName(eventAvro.getHubId(), scenarioRemoved.getName()).isEmpty()) {
-            throw new RuntimeException(String.format("Scenario: %s is not  exists", eventAvro));
+            throw new NonConsistentDataException(String.format("Scenario: %s is not  exists", eventAvro));
         }
 
         scenarioRepository.findByHubIdAndName(eventAvro.getHubId(), scenarioRemoved.getName()).stream()
@@ -189,7 +151,5 @@ public class HubDBService {
                             scenario.getActions().clear();
                             scenarioRepository.delete(scenario);
                         });
-
-        return true;
     }
 }

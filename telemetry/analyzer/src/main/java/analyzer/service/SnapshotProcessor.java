@@ -1,7 +1,7 @@
 package analyzer.service;
 
 import analyzer.dal.service.SnapshotAnalyzer;
-import analyzer.kafka.AnalyzerClient;
+import analyzer.kafka.AnalyzerSnapshotClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SnapshotProcessor implements Runnable {
     private final Environment env;
-    private final AnalyzerClient client;
+    private final AnalyzerSnapshotClient client;
     private final SnapshotAnalyzer snapshotAnalyzer;
 
     private static final Duration CONSUMER_TIMEOUT = Duration.ofMillis(500);
@@ -30,19 +30,19 @@ public class SnapshotProcessor implements Runnable {
 
     @Override
     public void run() {
-        Runtime.getRuntime().addShutdownHook(new Thread(client.getHubConsumer()::wakeup));
+        Runtime.getRuntime().addShutdownHook(new Thread(client.getConsumer()::wakeup));
         try {
             while (true) {
                 log.info("Getting snapshots...");
-                processRecords(client.getSnapshotConsumer().poll(CONSUMER_TIMEOUT));
+                processRecords(client.getConsumer().poll(CONSUMER_TIMEOUT));
             }
         } catch (WakeupException ignored) {
 
         } catch (Exception e) {
-            log.error("Error during process 'telemetry.snapshots.v1'", e);
+            log.error("Error during process topic {}", env.getProperty("kafka.topics.events-snapshots"), e);
         } finally {
             try {
-                client.getHubConsumer().commitSync(currentOffsets);
+                client.getConsumer().commitSync(currentOffsets);
             } finally {
                 log.info("Closing analyzer hub consumer...");
                 client.stop();
@@ -55,10 +55,8 @@ public class SnapshotProcessor implements Runnable {
             log.info("Processing record - topic:[{}] partition:[{}] offset:[{}] value: {}",
                     snapshot.topic(), snapshot.partition(), snapshot.offset(), snapshot.value());
             if (snapshotAnalyzer.processSnapshot(snapshot.value())) {
-                client.getSnapshotConsumer().commitSync();
+                client.getConsumer().commitSync();
             }
         }
-        // коммит только после успешной отправки действия (или сохранения)
-
     }
 }

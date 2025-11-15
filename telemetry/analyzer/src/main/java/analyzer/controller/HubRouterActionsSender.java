@@ -23,10 +23,8 @@ public class HubRouterActionsSender {
             log.info("Sending action: {}", new Object());
             hubRouterClient.handleDeviceAction(actionRequest);
         } catch (Exception e) {
-
+            log.error("Error sending action", e);
+            throw new RuntimeException("Filed to send device action", e);
         }
-
-
-        // обработать ошибки через exception
     }
 }

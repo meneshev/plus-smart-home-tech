@@ -1,9 +1,11 @@
 package analyzer.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class AnalyzerRunner implements CommandLineRunner {
     final HubEventProcessor hubEventProcessor;
     final SnapshotProcessor snapshotProcessor;
@@ -14,6 +16,8 @@ public class AnalyzerRunner implements CommandLineRunner {
         hubEventThread.setName("HubEventHandlerThread");
         hubEventThread.start();
 
-        snapshotProcessor.start();
+        Thread shapshotEventThread = new Thread(snapshotProcessor);
+        shapshotEventThread.setName("SnapshotEventHandlerThread");
+        shapshotEventThread.start();
     }
 }

@@ -1,7 +1,7 @@
 package analyzer.service;
 
 import analyzer.dal.service.HubDBService;
-import analyzer.kafka.AnalyzerClient;
+import analyzer.kafka.AnalyzerHubClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class HubEventProcessor implements Runnable {
     private final Environment env;
-    private final AnalyzerClient client;
+    private final AnalyzerHubClient client;
     private final HubDBService hubDBService;
 
     private static final Duration CONSUMER_TIMEOUT = Duration.ofMillis(500);
@@ -30,19 +30,19 @@ public class HubEventProcessor implements Runnable {
 
     @Override
     public void run() {
-        Runtime.getRuntime().addShutdownHook(new Thread(client.getHubConsumer()::wakeup));
+        Runtime.getRuntime().addShutdownHook(new Thread(client.getConsumer()::wakeup));
         try {
             while (true) {
                 log.info("Getting hub events...");
-                processRecords(client.getHubConsumer().poll(CONSUMER_TIMEOUT));
+                processRecords(client.getConsumer().poll(CONSUMER_TIMEOUT));
             }
         } catch (WakeupException ignored) {
 
         } catch (Exception e) {
-            log.error("Error during process 'hub.sensors.v1'", e);
+            log.error("Error during process topic {}", env.getProperty("kafka.topics.hub-events"), e);
         } finally {
             try {
-                client.getHubConsumer().commitSync(currentOffsets);
+                client.getConsumer().commitSync(currentOffsets);
             } finally {
                 log.info("Closing analyzer hub consumer...");
                 client.stop();
@@ -60,9 +60,9 @@ public class HubEventProcessor implements Runnable {
                         new TopicPartition(event.topic(), event.partition()),
                         new OffsetAndMetadata(event.offset() + 1)
                 );
-                client.getHubConsumer().commitSync(currentOffsets);
+                client.getConsumer().commitSync(currentOffsets);
             }
-            client.getHubConsumer().commitAsync();
+            client.getConsumer().commitAsync();
         }
     }
 }

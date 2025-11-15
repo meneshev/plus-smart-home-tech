@@ -31,7 +31,6 @@ public class Scenario {
             joinColumns = @JoinColumn(name = "scenario_id"),
             inverseJoinColumns = @JoinColumn(name = "condition_id")
     )
-    //key - sensor_id
     private Map<String, Condition> conditions = new HashMap<>();
 
     @OneToMany
