@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
 
 @Getter
 @Setter
@@ -15,8 +16,8 @@ public class Action {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private ActionTypeAvro type;
 
     private Integer value;
 }

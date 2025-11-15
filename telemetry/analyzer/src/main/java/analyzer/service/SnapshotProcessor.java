@@ -1,5 +1,6 @@
 package analyzer.service;
 
+import analyzer.dal.service.SnapshotAnalyzer;
 import analyzer.kafka.AnalyzerClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class SnapshotProcessor implements Runnable {
     private final Environment env;
     private final AnalyzerClient client;
+    private final SnapshotAnalyzer snapshotAnalyzer;
 
     private static final Duration CONSUMER_TIMEOUT = Duration.ofMillis(500);
     private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
@@ -52,6 +54,9 @@ public class SnapshotProcessor implements Runnable {
         for (ConsumerRecord<Void, SensorsSnapshotAvro> snapshot : snapshots) {
             log.info("Processing record - topic:[{}] partition:[{}] offset:[{}] value: {}",
                     snapshot.topic(), snapshot.partition(), snapshot.offset(), snapshot.value());
+            if (snapshotAnalyzer.processSnapshot(snapshot.value())) {
+                client.getSnapshotConsumer().commitSync();
+            }
         }
         // коммит только после успешной отправки действия (или сохранения)
 

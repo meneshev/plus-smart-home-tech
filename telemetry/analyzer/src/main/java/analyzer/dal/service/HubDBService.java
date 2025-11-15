@@ -1,9 +1,6 @@
 package analyzer.dal.service;
 
-import analyzer.dal.entity.Action;
-import analyzer.dal.entity.Condition;
-import analyzer.dal.entity.Scenario;
-import analyzer.dal.entity.Sensor;
+import analyzer.dal.entity.*;
 import analyzer.dal.repository.ActionRepository;
 import analyzer.dal.repository.ConditionRepository;
 import analyzer.dal.repository.ScenarioRepository;
@@ -120,8 +117,8 @@ public class HubDBService {
                         HashMap::new,
                         (map, conditionAvro) -> {
                             Condition newCnd = Condition.builder()
-                                    .type(conditionAvro.getType().name())
-                                    .operation(conditionAvro.getOperation().name())
+                                    .type(conditionAvro.getType())
+                                    .operation(ConditionOperation.valueOf(conditionAvro.getOperation().name()))
                                     .build();
 
                             if (conditionAvro.getValue() != null) {
@@ -153,7 +150,7 @@ public class HubDBService {
                 .collect(HashMap::new,
                         (map, actionAvro) -> {
                             Action newAct = Action.builder()
-                                    .type(actionAvro.getType().name())
+                                    .type(actionAvro.getType())
                                     .build();
 
                             if (actionAvro.getValue() != null) {

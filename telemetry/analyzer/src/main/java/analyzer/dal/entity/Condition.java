@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 
-@Getter
-@Setter
-@Builder
+@Getter @Setter @Builder
 @Entity
 @Table(name = "conditions")
 public class Condition {
@@ -15,11 +14,11 @@ public class Condition {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private ConditionTypeAvro type;
 
-    @Column(nullable = false)
-    private String operation;
+    @Enumerated(EnumType.STRING)
+    private ConditionOperation operation;
 
     private Integer value;
 }
