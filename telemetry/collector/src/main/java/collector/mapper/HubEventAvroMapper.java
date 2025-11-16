@@ -45,7 +45,7 @@ public final class HubEventAvroMapper {
                         hubEventProto.getScenarioAdded().getConditionList().stream()
                                 .map(condition -> ScenarioConditionAvro.newBuilder()
                                         .setSensorId(condition.getSensorId())
-                                        .setType(CondiionTypeAvro.valueOf(condition.getType().name()))
+                                        .setType(ConditionTypeAvro.valueOf(condition.getType().name()))
                                         .setOperation(ConditionOperationAvro.valueOf(condition.getOperation().name()))
                                         .setValue(
                                             switch (condition.getValueCase()) {
