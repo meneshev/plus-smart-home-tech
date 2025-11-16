@@ -1,7 +1,6 @@
 package analyzer.dal.service;
 
 import analyzer.controller.HubRouterActionsSender;
-import analyzer.dal.entity.Action;
 import analyzer.dal.entity.Condition;
 import analyzer.dal.entity.ConditionOperation;
 import analyzer.dal.entity.Scenario;
@@ -11,7 +10,6 @@ import com.google.protobuf.Timestamp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;

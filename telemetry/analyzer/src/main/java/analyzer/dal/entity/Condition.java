@@ -6,6 +6,7 @@ import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 
 @Getter @Setter @Builder
 @Entity
+@ToString
 @Table(name = "conditions")
 @NoArgsConstructor
 @AllArgsConstructor

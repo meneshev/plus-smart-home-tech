@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
 
-@Getter
-@Setter
-@Builder
+@Getter @Setter @Builder
 @Entity
+@ToString
 @Table(name = "actions")
 @NoArgsConstructor
 @AllArgsConstructor

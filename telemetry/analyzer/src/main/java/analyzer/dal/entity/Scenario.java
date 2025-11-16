@@ -6,11 +6,9 @@ import lombok.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
-@Setter
-@Builder
-@ToString
+@Getter @Setter @Builder
 @Entity
+@ToString
 @Table(name = "scenarios")
 @NoArgsConstructor
 @AllArgsConstructor

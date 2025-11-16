@@ -6,11 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 
-@Getter
-@Setter
-@Builder
-@ToString
+@Getter @Setter @Builder
 @Entity
+@ToString
 @Table(name = "sensors")
 @NoArgsConstructor
 @AllArgsConstructor
