@@ -1,6 +1,7 @@
 package aggregator.service;
 
 import aggregator.kafka.AggregatorClient;
+import config.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -10,23 +11,20 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
-import java.time.Duration;
 import java.util.*;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AggregationStarter {
-    private final Environment env;
+    private final KafkaProperties props;
     private final AggregatorClient client;
 
-    private static final Duration CONSUMER_TIMEOUT = Duration.ofMillis(500);
     private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
     private static final Map<String, SensorsSnapshotAvro> hubSnapshots = new HashMap<>();
 
@@ -34,12 +32,12 @@ public class AggregationStarter {
         Runtime.getRuntime().addShutdownHook(new Thread(client.getConsumer()::wakeup));
         try {
             while (true) {
-                List<SensorsSnapshotAvro> sensorSnapshots = processRecords(client.getConsumer().poll(CONSUMER_TIMEOUT));
+                List<SensorsSnapshotAvro> sensorSnapshots = processRecords(client.getConsumer().poll(props.getConsumer().getTimeoutMs()));
                 if (!sensorSnapshots.isEmpty()) {
                     sensorSnapshots.forEach(snapshot -> {
                         log.info("Sending snapshot: {}", snapshot);
                         client.getProducer().send(
-                                new ProducerRecord<>(env.getProperty("kafka.topics.events-snapshots"), null, snapshot));
+                                new ProducerRecord<>(props.getTopics().getEventsSnapshots(), null, snapshot));
                     });
                 }
             }

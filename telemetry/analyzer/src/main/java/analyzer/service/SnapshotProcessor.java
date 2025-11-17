@@ -2,6 +2,7 @@ package analyzer.service;
 
 import analyzer.dal.service.SnapshotAnalyzer;
 import analyzer.kafka.AnalyzerSnapshotClient;
+import config.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -9,11 +10,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,11 +20,10 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class SnapshotProcessor implements Runnable {
-    private final Environment env;
+    private final KafkaProperties props;
     private final AnalyzerSnapshotClient client;
     private final SnapshotAnalyzer snapshotAnalyzer;
 
-    private static final Duration CONSUMER_TIMEOUT = Duration.ofMillis(500);
     private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
 
     @Override
@@ -34,12 +32,12 @@ public class SnapshotProcessor implements Runnable {
         try {
             while (true) {
                 log.info("Getting snapshots...");
-                processRecords(client.getConsumer().poll(CONSUMER_TIMEOUT));
+                processRecords(client.getConsumer().poll(props.getConsumer().getTimeoutMs()));
             }
         } catch (WakeupException ignored) {
 
         } catch (Exception e) {
-            log.error("Error during process topic {}", env.getProperty("kafka.topics.events-snapshots"), e);
+            log.error("Error during process topic {}", props.getTopics().getEventsSnapshots(), e);
         } finally {
             try {
                 client.getConsumer().commitSync(currentOffsets);

@@ -51,7 +51,8 @@ public class HubDBService {
     private void handleDeviceAdded(HubEventAvro eventAvro) {
         DeviceAddedEventAvro addedEvent = (DeviceAddedEventAvro) eventAvro.getPayload();
         if (sensorRepository.existsByIdAndHubId(addedEvent.getId(), eventAvro.getHubId())) {
-            throw new NonConsistentDataException(String.format("Sensor: %s already exists", eventAvro));
+            log.error("Sensor: {} already exists", eventAvro);
+            return;
         }
 
         Sensor newSensor = Sensor.builder()
@@ -66,7 +67,7 @@ public class HubDBService {
     private void handleDeviceRemoved(HubEventAvro eventAvro) {
         DeviceRemovedEventAvro removedEvent = (DeviceRemovedEventAvro) eventAvro.getPayload();
         if (!sensorRepository.existsByIdAndHubId(removedEvent.getId(), eventAvro.getHubId())) {
-            throw new NonConsistentDataException(String.format("Sensor: %s is no exists", eventAvro));
+            throw new NonConsistentDataException(String.format("Sensor: %s is not exists", eventAvro));
         }
         scenarioRepository.findByHubId(eventAvro.getHubId()).stream()
                 .filter(scenario -> scenario.getConditions().containsKey(removedEvent.getId())
@@ -88,7 +89,8 @@ public class HubDBService {
     private void handleScenarioAdded(HubEventAvro eventAvro) {
         ScenarioAddedEventAvro addedEvent = (ScenarioAddedEventAvro) eventAvro.getPayload();
         if (scenarioRepository.findByHubIdAndName(eventAvro.getHubId(), addedEvent.getName()).isPresent()) {
-            throw new NonConsistentDataException(String.format("Scenario: %s is already exists", eventAvro));
+            log.error("Scenario: {} already exists", eventAvro);
+            return;
         }
 
         Map<String, Condition> newConditions = addedEvent.getConditions().stream()

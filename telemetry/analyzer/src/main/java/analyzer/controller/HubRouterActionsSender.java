@@ -20,7 +20,7 @@ public class HubRouterActionsSender {
     @Scheduled(initialDelay = 1000, fixedDelay = 1000)
     public void sendAction(DeviceActionRequest actionRequest) {
         try {
-            log.info("Sending action: {}", new Object());
+            log.info("Sending action: {}", actionRequest);
             hubRouterClient.handleDeviceAction(actionRequest);
         } catch (Exception e) {
             log.error("Error sending action", e);
