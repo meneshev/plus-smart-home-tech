@@ -13,18 +13,13 @@ spring:
     banner-mode: off
   kafka:
     properties:
-      bootstrap.servers: "localhost:9092"
-      key.serializer: "org.apache.kafka.common.serialization.VoidSerializer"
+      bootstrap-servers: "localhost:9092"
+      key-serializer: "org.apache.kafka.common.serialization.VoidSerializer"
       producer:
         linger-ms: 5
-
-kafka:
-  topics:
-    sensor-events: "telemetry.sensors.v1"
-    hub-events: "telemetry.hubs.v1"
-    events-snapshots: "telemetry.snapshots.v1"
-  groups:
-    aggregator: "aggregator-group"
+      topics:
+        sensor-events: "telemetry.sensors.v1"
+        hub-events: "telemetry.hubs.v1"
 
 logging:
   level:

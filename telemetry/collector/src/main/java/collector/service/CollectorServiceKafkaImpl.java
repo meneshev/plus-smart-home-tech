@@ -3,10 +3,10 @@ package collector.service;
 import collector.kafka.CollectorClient;
 import collector.mapper.HubEventAvroMapper;
 import collector.mapper.SensorEventAvroMapper;
+import config.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
@@ -17,13 +17,13 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 @Service
 @RequiredArgsConstructor
 public class CollectorServiceKafkaImpl implements CollectorService {
-    private final Environment env;
+    private final KafkaProperties props;
     private final CollectorClient client;
 
     @Override
     public void sendToQueue(HubEventProto event) {
         client.getProducer().send(
-                new ProducerRecord<>(env.getProperty("kafka.topics.hub-events"), null, eventToAvro(event))
+                new ProducerRecord<>(props.getTopics().getHubEvents(), null, eventToAvro(event))
         );
         log.info("Sent to queue with event {}", eventToAvro(event));
     }
@@ -31,7 +31,7 @@ public class CollectorServiceKafkaImpl implements CollectorService {
     @Override
     public void sendToQueue(SensorEventProto event) {
         client.getProducer().send(
-                new ProducerRecord<>(env.getProperty("kafka.topics.sensor-events"), null, eventToAvro(event))
+                new ProducerRecord<>(props.getTopics().getSensorEvents(), null, eventToAvro(event))
         );
         log.info("Sent to queue with event {}", eventToAvro(event));
     }

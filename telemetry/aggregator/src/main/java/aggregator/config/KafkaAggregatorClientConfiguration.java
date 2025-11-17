@@ -1,6 +1,7 @@
 package aggregator.config;
 
 import aggregator.kafka.AggregatorClient;
+import config.KafkaProperties;
 import kafka.SensorEventDeserializer;
 import kafka.SmartHomeTechAvroSerializer;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.env.Environment;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
@@ -23,7 +23,7 @@ import java.util.Properties;
 @Configuration
 @RequiredArgsConstructor
 public class KafkaAggregatorClientConfiguration {
-    private final Environment env;
+    private final KafkaProperties kafkaProps;
 
     @Scope("prototype")
     @Bean
@@ -50,23 +50,23 @@ public class KafkaAggregatorClientConfiguration {
 
             private void initConsumer() {
                 Properties props = new Properties();
-                props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.properties.bootstrap.servers"));
-                props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, env.getProperty("spring.kafka.properties.key.deserializer"));
+                props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProps.getBootstrapServers());
+                props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, kafkaProps.getKeyDeserializer());
                 props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SensorEventDeserializer.class.getName());
-                props.put(ConsumerConfig.GROUP_ID_CONFIG, env.getProperty("kafka.groups.aggregator"));
-                props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, env.getProperty("spring.kafka.properties.consumer.auto-commit"));
+                props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProps.getConsumer().getGroups().getAggregator());
+                props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, kafkaProps.getConsumer().isAutoCommit());
 
                 consumer = new KafkaConsumer<>(props);
 
-                consumer.subscribe(List.of(env.getProperty("kafka.topics.sensor-events")));
+                consumer.subscribe(List.of(kafkaProps.getTopics().getSensorEvents()));
             }
 
             private void initProducer() {
                 Properties props = new Properties();
-                props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.properties.bootstrap.servers"));
-                props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, env.getProperty("spring.kafka.properties.key.serializer"));
+                props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProps.getBootstrapServers());
+                props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaProps.getKeySerializer());
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, SmartHomeTechAvroSerializer.class.getName());
-                props.put(ProducerConfig.LINGER_MS_CONFIG, env.getProperty("spring.kafka.properties.producer.linger-ms"));
+                props.put(ProducerConfig.LINGER_MS_CONFIG, kafkaProps.getProducer().getLingerMs());
 
                 producer = new KafkaProducer<>(props);
             }

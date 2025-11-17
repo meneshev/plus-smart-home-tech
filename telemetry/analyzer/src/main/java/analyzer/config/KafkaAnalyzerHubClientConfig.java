@@ -1,6 +1,7 @@
 package analyzer.config;
 
 import analyzer.kafka.AnalyzerHubClient;
+import config.KafkaProperties;
 import kafka.HubEventDeserializer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -9,7 +10,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.env.Environment;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Properties;
 @Configuration
 @RequiredArgsConstructor
 public class KafkaAnalyzerHubClientConfig {
-    private final Environment env;
+    private final KafkaProperties kafkaProps;
 
     @Scope("prototype")
     @Bean
@@ -37,15 +37,15 @@ public class KafkaAnalyzerHubClientConfig {
 
             private void initHubConsumer() {
                 Properties props = new Properties();
-                props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.properties.bootstrap.servers"));
-                props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, env.getProperty("spring.kafka.properties.key.deserializer"));
+                props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProps.getBootstrapServers());
+                props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, kafkaProps.getKeyDeserializer());
                 props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, HubEventDeserializer.class.getName());
-                props.put(ConsumerConfig.GROUP_ID_CONFIG, env.getProperty("kafka.groups.analyzer-hub"));
-                props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, env.getProperty("spring.kafka.properties.consumer.auto-commit"));
+                props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProps.getConsumer().getGroups().getAnalyzerHub());
+                props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, kafkaProps.getConsumer().isAutoCommit());
 
                 hubConsumer = new KafkaConsumer<>(props);
 
-                hubConsumer.subscribe(List.of(env.getProperty("kafka.topics.hub-events")));
+                hubConsumer.subscribe(List.of(kafkaProps.getTopics().getHubEvents()));
             }
 
             @Override
