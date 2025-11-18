@@ -8,7 +8,7 @@ protocol HubEventProtocol {
 		SWITCH_SENSOR
 	}
 
-	enum CondiionTypeAvro {
+	enum ConditionTypeAvro {
 		MOTION,
 		LUMINOSITY,
 		SWITCH,
@@ -41,7 +41,7 @@ protocol HubEventProtocol {
 
 	record ScenarioConditionAvro {
 		string sensor_id;
-		CondiionTypeAvro type;
+		ConditionTypeAvro type;
 		ConditionOperationAvro operation;
 		union { null, int, boolean } value;
 	}
