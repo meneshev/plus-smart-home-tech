@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native #использование конфигов из classpath
+  cloud:
+    config:
+      server:
+        native:
+          search-locations:
+            - classpath:config/telemetry/{application}
+
+server:
+  port: 8888
