@@ -1,0 +1,31 @@
+server:
+  port: 9094
+
+spring:
+  application:
+    name: aggregator
+  main:
+    log-startup-info: false
+    banner-mode: off
+  kafka:
+    properties:
+      bootstrap-servers: "localhost:9092"
+      key-serializer: "org.apache.kafka.common.serialization.VoidSerializer"
+      key-deserializer: "org.apache.kafka.common.serialization.VoidDeserializer"
+      consumer:
+        auto-commit: false
+        timeout-ms: 500
+        groups:
+          aggregator: "aggregator-group"
+      producer:
+        linger-ms: 5
+      topics:
+        sensor-events: "telemetry.sensors.v1"
+        events-snapshots: "telemetry.snapshots.v1"
+
+logging:
+  level:
+    org:
+      springframework.context: ERROR
+      apache.kafka: ERROR
+      springframework.cloud.netflix.eureka: INFO
