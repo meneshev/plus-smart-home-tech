@@ -1,2 +1,33 @@
 server:
   port: 0
+
+spring:
+  application:
+    name: shopping-store
+  main:
+    log-startup-info: false
+    banner-mode: off
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+  datasource:
+    url: jdbc:postgresql://localhost:5435/commerce
+    driverClassName: org.postgresql.Driver
+    username: commerce.store
+    password: 12345
+
+logging:
+  level:
+    org:
+      springframework:
+        context: ERROR
+        jdbc: DEBUG
+        cloud.netflix.eureka: INFO
+      hibernate:
+        SQL: DEBUG
+      root: INFO
