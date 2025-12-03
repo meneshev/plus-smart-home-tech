@@ -1,23 +1,54 @@
 package dto;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import util.validation.ValidEnum;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductDto {
+
     private String productId;
 
-    //Not null
+    @NotBlank
     private String productName;
-    //Not null
+
+    @NotBlank
     private String description;
 
     private String imageSrc;
-    //Not null
-    private QuantityState quantityState;
-    //Not null
-    private ProductState productState;
 
-    private ProductCategory productCategory;
-    //Not null
+    @NotBlank
+    @ValidEnum(
+            enumClass = QuantityState.class,
+            values = { "ENDED", "FEW", "ENOUGH", "MANY" },
+            message = "Недопустимое значение. Допустимые: {accepted}"
+    )
+    private String quantityState;
+
+    @NotBlank
+    @ValidEnum(
+            enumClass = ProductState.class,
+            values = { "ACTIVE", "DEACTIVATE" },
+            message = "Недопустимое значение. Допустимые: {accepted}"
+    )
+    private String productState;
+
+    @NotBlank
+    @ValidEnum(
+            enumClass = ProductCategory.class,
+            values = { "LIGHTING", "CONTROL", "SENSORS" },
+            message = "Недопустимое значение. Допустимые: {accepted}"
+    )
+    private String productCategory;
+
+    @NotBlank
+    @DecimalMin(value = "1", message = "Минимально допустимая цена товара: 1")
     private double price;
 }
