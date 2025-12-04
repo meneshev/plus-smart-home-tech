@@ -40,7 +40,6 @@ public class ProductDto {
     )
     private String productState;
 
-    @NotBlank
     @ValidEnum(
             enumClass = ProductCategory.class,
             values = { "LIGHTING", "CONTROL", "SENSORS" },
