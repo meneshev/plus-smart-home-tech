@@ -21,6 +21,12 @@ spring:
         sensor-events: "telemetry.sensors.v1"
         hub-events: "telemetry.hubs.v1"
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
 logging:
   level:
     org.springframework.context: ERROR

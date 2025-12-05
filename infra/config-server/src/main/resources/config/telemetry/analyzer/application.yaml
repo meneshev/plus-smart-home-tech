@@ -37,8 +37,14 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5434/telemetry_analyzer
     driverClassName: org.postgresql.Driver
-    username: analyzer.user
+    username: smart_home_tech.service_user
     password: 12345
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
 
 logging:
   level:

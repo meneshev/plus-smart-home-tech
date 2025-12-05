@@ -16,10 +16,16 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
   datasource:
-    url: jdbc:postgresql://localhost:5435/commerce
+    url: jdbc:postgresql://localhost:5434/commerce_shopping_store
     driverClassName: org.postgresql.Driver
-    username: commerce.store
+    username: smart_home_tech.service_user
     password: 12345
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
 
 logging:
   level:
