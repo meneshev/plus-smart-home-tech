@@ -5,11 +5,10 @@ import dto.ProductDto;
 import dto.SetProductQuantityStateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mapper.ProductMapper;
+import store.dal.mapper.ProductMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import store.dal.repository.ProductRepository;
 
 import java.util.UUID;
@@ -17,14 +16,12 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class StoreServiceImpl implements StoreService {
     private final ProductRepository productRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public Page<ProductDto> getProductsByCategory(ProductCategory category, Pageable pageable) {
-        return productRepository.findProductsByCategory(category, pageable).map(ProductMapper::convertToDto);
+        return productRepository.findProductsByProductCategory(category, pageable).map(ProductMapper::convertToDto);
     }
 
     @Override

@@ -3,7 +3,6 @@ package store.controller;
 import dto.ProductCategory;
 import dto.ProductDto;
 import dto.SetProductQuantityStateRequest;
-import entity.Product;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

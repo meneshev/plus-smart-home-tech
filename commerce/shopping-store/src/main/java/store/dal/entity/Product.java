@@ -1,4 +1,4 @@
-package entity;
+package store.dal.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

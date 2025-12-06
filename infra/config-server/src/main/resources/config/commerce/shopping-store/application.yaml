@@ -18,7 +18,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5434/commerce_shopping_store
     driverClassName: org.postgresql.Driver
-    username: smart_home_tech.service_user
+    username: analyzer.user
     password: 12345
 
 management:
@@ -31,7 +31,7 @@ logging:
   level:
     org:
       springframework:
-        context: ERROR
+        context: DEBUG
         jdbc: DEBUG
         cloud.netflix.eureka: INFO
       hibernate:

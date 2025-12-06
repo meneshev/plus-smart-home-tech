@@ -16,3 +16,8 @@ spring:
     client:
       service-url:
         default-zone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
+  datasource:
+    url: jdbc:postgresql://localhost:5434/commerce_shopping_store
+    driverClassName: org.postgresql.Driver
+    username: analyzer.user
+    password: 12345

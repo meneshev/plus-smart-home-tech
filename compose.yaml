@@ -39,7 +39,7 @@ services:
     container_name: postgres-analyzer
     hostname: postgres
     environment:
-      POSTGRES_USER: smart_home_tech.service_user
+      POSTGRES_USER: analyzer.user
       POSTGRES_PASSWORD: 12345
       POSTGRES_DB: telemetry_analyzer
     healthcheck:
@@ -57,15 +57,13 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      POSTGRES_USER: smart_home_tech.service_user
-      POSTGRES_PASSWORD: 12345
-      POSTGRES_PORT: 5434
+      PGPASSWORD: 12345
     entrypoint:
       - bash
       - -c
       - |
         set -e
-        PGPASSWORD="${POSTGRES_PASSWORD}" psql -h postgres -p 5434 -U "${POSTGRES_USER}" -d postgres -v ON_ERROR_STOP=1 <<-EOSQL
+        psql -h postgres -p 5432 -U analyzer.user -d postgres -v ON_ERROR_STOP=1 <<-EOSQL
         CREATE DATABASE commerce_shopping_cart;
         CREATE DATABASE commerce_shopping_store;
         CREATE DATABASE commerce_warehouse;
