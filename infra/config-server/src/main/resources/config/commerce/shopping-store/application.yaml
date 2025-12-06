@@ -7,6 +7,9 @@ spring:
   main:
     log-startup-info: false
     banner-mode: off
+  aop:
+    proxy-target-class: true
+    auto: true
   sql:
     init:
       mode: always
@@ -29,11 +32,26 @@ management:
 
 logging:
   level:
-    org:
-      springframework:
-        context: DEBUG
-        jdbc: DEBUG
-        cloud.netflix.eureka: INFO
-      hibernate:
-        SQL: DEBUG
-      root: INFO
+    root: INFO
+
+    # AOP & Aspects
+    org.springframework.aop: DEBUG
+    org.springframework.aop.framework: DEBUG
+    org.springframework.aop.framework.autoproxy: DEBUG
+    org.aspectj.weaver: DEBUG
+    util.logging: DEBUG
+
+    store.service: DEBUG
+    store.controller: DEBUG
+
+    # Spring internals
+    org.springframework.context: DEBUG
+    org.springframework.beans.factory: DEBUG
+
+    # Database
+    org.springframework.jdbc: DEBUG
+    org.hibernate.SQL: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+    # Eureka
+    org.springframework.cloud.netflix.eureka: INFO

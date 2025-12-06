@@ -15,9 +15,9 @@ spring:
   eureka:
     client:
       service-url:
-        default-zone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
-  datasource:
-    url: jdbc:postgresql://localhost:5434/commerce_shopping_store
-    driverClassName: org.postgresql.Driver
-    username: analyzer.user
-    password: 12345
+        default-zone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/ # адрес для регистрации discovery service
+    instance: # описание экземпляров текущего сервиса
+      prefer-ip-address: true # регистрировать этот сервис по IP-адресу
+      hostname: localhost
+      instance-id: "${spring.application.name}:${random.value}" # уникальный ID конкретного экземпляра сервиса
+      lease-renewal-interval-in-seconds: 10 # interval health checkов в eureka

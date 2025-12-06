@@ -2,6 +2,7 @@ package dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,7 +48,7 @@ public class ProductDto {
     )
     private String productCategory;
 
-    @NotBlank
+    @NotNull
     @DecimalMin(value = "1", message = "Минимально допустимая цена товара: 1")
-    private double price;
+    private Double price;
 }

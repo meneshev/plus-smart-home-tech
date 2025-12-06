@@ -1,8 +1,6 @@
 package store.service;
 
-import dto.ProductCategory;
-import dto.ProductDto;
-import dto.SetProductQuantityStateRequest;
+import dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import store.dal.mapper.ProductMapper;
@@ -10,6 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import store.dal.repository.ProductRepository;
+import util.exception.NotFoundException;
+import util.exception.ValidationException;
+import util.logging.Loggable;
 
 import java.util.UUID;
 
@@ -19,42 +20,69 @@ import java.util.UUID;
 public class StoreServiceImpl implements StoreService {
     private final ProductRepository productRepository;
 
+    @Loggable
     @Override
     public Page<ProductDto> getProductsByCategory(ProductCategory category, Pageable pageable) {
         return productRepository.findProductsByProductCategory(category, pageable).map(ProductMapper::convertToDto);
     }
 
+    @Loggable
     @Override
-    public ProductDto updateProduct(ProductDto productDto) throws Exception {
-        if (!productRepository.findById(UUID.fromString(productDto.getProductId())).isPresent()) {
-            throw new Exception("Not found");  // TODO change exception
-        }
-
+    public ProductDto updateProduct(ProductDto productDto) {
+        checkProductExists(productDto.getProductId());
         return ProductMapper.convertToDto(
                 productRepository.save(ProductMapper.toEntity(productDto))
         );
     }
 
+    @Loggable
     @Override
     public ProductDto createProduct(ProductDto productDto) {
+        if (productDto.getProductId() != null) {
+            throw new ValidationException("productId must be null");
+        }
         return ProductMapper.convertToDto(
                 productRepository.save(ProductMapper.toEntity(productDto))
         );
     }
 
+    @Loggable
     @Override
     public boolean removeProduct(String productId) {
-        productRepository.deleteById(UUID.fromString(productId));
-        return !productRepository.findById(UUID.fromString(productId)).isPresent();
+        checkProductExists(productId);
+        productRepository.removeProduct(UUID.fromString(productId));
+        return productRepository.findById(UUID.fromString(productId)).get().getProductState().equals(ProductState.DEACTIVATE);
     }
 
+    @Loggable
     @Override
-    public boolean updateProductQt(SetProductQuantityStateRequest qtRequest) {
-        return false;
+    public boolean updateProductQt(String quantityState, String productId) {
+        checkProductExists(productId);
+
+        UUID uuid = UUID.fromString(productId);
+        QuantityState qState;
+        try {
+            qState = QuantityState.valueOf(quantityState);
+        } catch (IllegalArgumentException e) {
+            log.error("Incorrect quantity state: {}", quantityState);
+            throw new ValidationException(String.format("Incorrect quantity state: %s", quantityState));
+        }
+
+        productRepository.setQuantityStateByProductId(qState, uuid);
+        return productRepository.findById(uuid).get().getQuantityState().equals(qState);
     }
 
+    @Loggable
     @Override
     public ProductDto getProductById(String productId) {
-        return null;
+        checkProductExists(productId);
+        return ProductMapper.convertToDto(productRepository.findById(UUID.fromString(productId)).get());
+    }
+
+    private void checkProductExists(String productId) {
+        if (productRepository.findById(UUID.fromString(productId)).isEmpty()) {
+            log.error("Product with id:{} not found",  productId);
+            throw new NotFoundException(String.format("Product with id:%s not found", productId));
+        }
     }
 }

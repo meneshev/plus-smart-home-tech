@@ -3,12 +3,16 @@ spring:
     name: config-server
   profiles:
     active: native #использование конфигов из classpath
+  main:
+    log-startup-info: false
+    banner-mode: off
   cloud:
     config:
       server:
         native:
           search-locations:
             - classpath:config/telemetry/{application}
+            - classpath:config/commerce/{application}
   eureka:
     client:
       service-url:
