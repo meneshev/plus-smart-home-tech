@@ -6,7 +6,7 @@ CREATE SCHEMA IF NOT EXISTS storage;
 CREATE TABLE IF NOT EXISTS storage.Warehouse (
      Warehouse_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
      Warehouse_Name VARCHAR NOT NULL,
-     Warehouse_bedDt TIMESTAMP,
+     Warehouse_begDt TIMESTAMP,
      Warehouse_endDt TIMESTAMP
 );
 
@@ -40,15 +40,3 @@ CREATE TABLE IF NOT EXISTS storage.Warehouse_Product (
     Quantity BIGINT NOT NULL,
     PRIMARY KEY (Warehouse_id, Product_id)
 );
-
-INSERT INTO "storage".warehouse
-(warehouse_name, warehouse_beddt, warehouse_enddt)
-VALUES('Склад по умолчанию', '2025-01-01 00:00:00.000', NULL);
-
-INSERT INTO "storage".address
-(warehouse_id, address_country, address_city, address_street, address_house, address_flat)
-VALUES(1, 'Россия', 'Москва', 'ул. Лесная', '1', '1');
-INSERT INTO "storage".address
-(warehouse_id, address_country, address_city, address_street, address_house, address_flat)
-VALUES(1, 'Россия', 'Москва', 'ул. Лесная', '1', '2');
-

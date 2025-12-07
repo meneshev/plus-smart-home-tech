@@ -20,7 +20,7 @@ public class Warehouse {
     @Column(nullable = false)
     private String warehouseName;
 
-    @Column(name = "Warehouse_bedDt")
+    @Column(name = "Warehouse_begDt")
     private LocalDateTime warehouseBegDate;
 
     @Column(name = "Warehouse_endDt")
