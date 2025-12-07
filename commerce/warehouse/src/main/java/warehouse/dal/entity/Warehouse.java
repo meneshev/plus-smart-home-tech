@@ -15,14 +15,15 @@ import java.time.LocalDateTime;
 public class Warehouse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Warehouse_id")
     private Long warehouseId;
 
-    @Column(nullable = false)
+    @Column(name = "Warehouse_Name", nullable = false)
     private String warehouseName;
 
-    @Column(name = "Warehouse_begDt")
+    @Column(name = "Warehouse_begdt")
     private LocalDateTime warehouseBegDate;
 
-    @Column(name = "Warehouse_endDt")
+    @Column(name = "Warehouse_enddt")
     private LocalDateTime warehouseEndDate;
 }

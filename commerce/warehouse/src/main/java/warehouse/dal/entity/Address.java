@@ -13,6 +13,7 @@ import lombok.*;
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Address_id")
     private Long addressId;
 
     @ManyToOne(fetch = FetchType.LAZY)

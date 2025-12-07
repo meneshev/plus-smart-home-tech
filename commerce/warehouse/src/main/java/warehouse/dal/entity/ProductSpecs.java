@@ -14,6 +14,7 @@ import java.util.UUID;
 @Table(schema = "storage")
 public class ProductSpecs {
     @Id
+    @Column(name = "Product_id")
     private UUID productId;
 
     @Column(name = "ProductSpecs_isFragile")

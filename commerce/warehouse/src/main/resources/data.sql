@@ -1,5 +1,5 @@
 INSERT INTO "storage".warehouse
-(warehouse_name, Warehouse_begDt, warehouse_enddt)
+(warehouse_name, Warehouse_begdt, warehouse_enddt)
 VALUES('Склад по умолчанию', '2025-01-01 00:00:00.000', NULL);
 
 INSERT INTO "storage".address

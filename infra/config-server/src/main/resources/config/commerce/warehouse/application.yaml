@@ -15,9 +15,10 @@ spring:
       mode: always
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    defer-datasource-initialization: true
   datasource:
     url: jdbc:postgresql://localhost:5434/commerce_warehouse
     driverClassName: org.postgresql.Driver
