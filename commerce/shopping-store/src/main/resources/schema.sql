@@ -6,7 +6,7 @@ CREATE SCHEMA IF NOT EXISTS store;
 
 --GRANT ALL PRIVILEGES ON DATABASE commerce_shopping_store TO "commerce.store";
 
-CREATE TABLE IF NOT EXISTS products (
+CREATE TABLE IF NOT EXISTS store.product (
     product_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_name VARCHAR NOT NULL,
     description VARCHAR NOT NULL,

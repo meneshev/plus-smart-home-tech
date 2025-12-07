@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UUID;
 import util.validation.ValidEnum;
 
 @Data
@@ -15,6 +16,7 @@ import util.validation.ValidEnum;
 @AllArgsConstructor
 public class ProductDto {
 
+    @UUID
     private String productId;
 
     @NotBlank
