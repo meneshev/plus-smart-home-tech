@@ -1,10 +1,56 @@
 server:
   port: 0
 
-
+spring:
+  application:
+    name: shopping-cart
+  main:
+    log-startup-info: false
+    banner-mode: off
+  aop:
+    proxy-target-class: true
+    auto: true
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+#      naming:
+#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+#        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+#    defer-datasource-initialization: true
+  datasource:
+    url: jdbc:postgresql://localhost:5434/commerce_shopping_cart
+    driverClassName: org.postgresql.Driver
+    username: analyzer.user
+    password: 12345
 
 management:
   endpoints:
     web:
       exposure:
         include: health, info
+
+logging:
+  level:
+    root: INFO
+
+    # AOP & Aspects
+    org.springframework.aop: DEBUG
+    org.springframework.aop.framework: DEBUG
+    org.springframework.aop.framework.autoproxy: DEBUG
+    org.aspectj.weaver: DEBUG
+    util.logging: DEBUG
+
+    # Spring internals
+    org.springframework.context: DEBUG
+    org.springframework.beans.factory: DEBUG
+
+    # Database
+    org.springframework.jdbc: DEBUG
+    org.hibernate.SQL: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+    # Eureka
+    org.springframework.cloud.netflix.eureka: INFO

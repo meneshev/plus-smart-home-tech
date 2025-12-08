@@ -41,7 +41,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public void addNewProduct(NewProductInWarehouseRequest request) {
         UUID productId = UUID.fromString(request.getProductId());
-        if (productSpecsRepository.findByProductId(productId)) {
+        if (productSpecsRepository.existsByProductId(productId)) {
             throw new ValidationException(String.format("Product with id %s already exists", productId));
         }
         productSpecsRepository.save(ProductSpecsMapper.toEntity(request));
@@ -51,16 +51,27 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public void addProduct(AddProductInWarehouseRequest request) {
         UUID productId = UUID.fromString(request.getProductId());
+
+        if (!productSpecsRepository.existsByProductId(productId)) {
+            throw new NotFoundException(String.format("Product with id %s not found", productId));
+        }
+
         WarehouseProductId id = WarehouseProductId.builder()
                 .warehouseId(DEFAULT_WAREHOUSE_ID)
                 .productId(productId)
                 .build();
 
         Optional<WarehouseProduct> product = warehouseProductRepository.findById(id);
-        if (product.isEmpty()) {
-            throw new NotFoundException(String.format("Product with id %s not found", productId));
+
+        if (product.isPresent()) {
+            product.get().setQuantity(request.getQuantity());
+        } else {
+            product = Optional.ofNullable(WarehouseProduct.builder()
+                    .id(id)
+                    .quantity(request.getQuantity())
+                    .build());
         }
-        product.get().setQuantity(request.getQuantity());
+
         warehouseProductRepository.save(product.get());
     }
 

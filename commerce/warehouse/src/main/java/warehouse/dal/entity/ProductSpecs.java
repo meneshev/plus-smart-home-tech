@@ -2,6 +2,7 @@ package warehouse.dal.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenerationTime;
 
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "storage")
+@Table(schema = "storage", name = "ProductSpecs")
 public class ProductSpecs {
     @Id
     @Column(name = "Product_id")
@@ -32,6 +33,6 @@ public class ProductSpecs {
     @Column(name = "ProductSpecs_Weight", nullable = false)
     private Double weight;
 
-    @Column(name = "ProductSpecs_Volume")
+    @Column(name = "ProductSpecs_Volume", insertable = false, updatable = false)
     private Double volume;
 }

@@ -17,7 +17,8 @@ spring:
     hibernate:
       ddl-auto: none
       naming:
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
     defer-datasource-initialization: true
   datasource:
     url: jdbc:postgresql://localhost:5434/commerce_warehouse
@@ -41,9 +42,6 @@ logging:
     org.springframework.aop.framework.autoproxy: DEBUG
     org.aspectj.weaver: DEBUG
     util.logging: DEBUG
-
-    #store.service: DEBUG
-    #store.controller: DEBUG
 
     # Spring internals
     org.springframework.context: DEBUG
