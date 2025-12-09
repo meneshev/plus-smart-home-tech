@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import store.dal.repository.ProductRepository;
 import util.exception.NotFoundException;
 import util.exception.ValidationException;
-import util.logging.Loggable;
 
 import java.util.UUID;
 
@@ -20,13 +19,11 @@ import java.util.UUID;
 public class StoreServiceImpl implements StoreService {
     private final ProductRepository productRepository;
 
-    @Loggable
     @Override
     public Page<ProductDto> getProductsByCategory(ProductCategory category, Pageable pageable) {
         return productRepository.findProductsByProductCategory(category, pageable).map(ProductMapper::convertToDto);
     }
 
-    @Loggable
     @Override
     public ProductDto updateProduct(ProductDto productDto) {
         checkProductExists(productDto.getProductId());
@@ -35,7 +32,6 @@ public class StoreServiceImpl implements StoreService {
         );
     }
 
-    @Loggable
     @Override
     public ProductDto createProduct(ProductDto productDto) {
         if (productDto.getProductId() != null) {
@@ -46,7 +42,6 @@ public class StoreServiceImpl implements StoreService {
         );
     }
 
-    @Loggable
     @Override
     public boolean removeProduct(String productId) {
         checkProductExists(productId);
@@ -54,7 +49,6 @@ public class StoreServiceImpl implements StoreService {
         return productRepository.findById(UUID.fromString(productId)).get().getProductState().equals(ProductState.DEACTIVATE);
     }
 
-    @Loggable
     @Override
     public boolean updateProductQt(String quantityState, String productId) {
         checkProductExists(productId);
@@ -72,7 +66,6 @@ public class StoreServiceImpl implements StoreService {
         return productRepository.findById(uuid).get().getQuantityState().equals(qState);
     }
 
-    @Loggable
     @Override
     public ProductDto getProductById(String productId) {
         checkProductExists(productId);

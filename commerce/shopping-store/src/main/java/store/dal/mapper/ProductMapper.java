@@ -4,7 +4,6 @@ import dto.ProductCategory;
 import dto.ProductDto;
 import dto.ProductState;
 import dto.QuantityState;
-//import entity.Product;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import store.dal.entity.Product;

@@ -7,11 +7,13 @@ import cart.dal.repository.ShoppingCartRepository;
 import cart.dal.repository.UserRepository;
 import dto.ChangeProductQuantityRequest;
 import dto.ShoppingCartDto;
+import feign.warehouse.WarehouseClient;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import util.exception.NotFoundException;
+import util.logging.Loggable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,26 +27,24 @@ import java.util.stream.Collectors;
 public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final UserRepository userRepository;
-
-    //TODO 1) Not nulls for products 2) npe at set quantity 3) logging 4) feign 4) circuit breaker? 5) errors in response
+    private final WarehouseClient warehouseClient;
 
     @Override
     public ShoppingCartDto addToCart(String username, Map<String, Long> products) {
         checkUsername(username);
         if (checkActive(username)) {
-            boolean checkWarehouse = true;
-            if (checkWarehouse) {
-                ShoppingCart cart = shoppingCartRepository.getShoppingCartByUser(userRepository.findByUsername(username));
-                if (cart.getProducts() == null) {
-                    cart.setProducts(new HashMap<>());
-                }
-                cart.getProducts().putAll(products.entrySet().stream().collect(Collectors.toMap(
-                        entry -> UUID.fromString(entry.getKey()),
-                        Map.Entry::getValue
-                )));
-                shoppingCartRepository.save(cart);
-                return ShoppingCartMapper.toDto(cart);
+            ShoppingCart cart = shoppingCartRepository.getShoppingCartByUser(userRepository.findByUsername(username));
+            if (cart.getProducts() == null) {
+                cart.setProducts(new HashMap<>());
             }
+            cart.getProducts().putAll(products.entrySet().stream().collect(Collectors.toMap(
+                    entry -> UUID.fromString(entry.getKey()),
+                    Map.Entry::getValue
+            )));
+
+            warehouseClient.check(ShoppingCartMapper.toDto(cart));
+            shoppingCartRepository.save(cart);
+            return ShoppingCartMapper.toDto(cart);
         }
         return null;
     }
@@ -89,33 +89,28 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return ShoppingCartMapper.toDto(cart);
     }
 
+    @Loggable
     @Override
     public ShoppingCartDto changeQuantity(String username, ChangeProductQuantityRequest request) {
+        log.info("Received request to change quantity {} for user {}", request, username);
         checkUsername(username);
-        if (!checkActive(username)) {
-            log.error("Cart username {} is not active", username);
-            throw new ValidationException("Cannot remove product from deactivated shopping cart");
+
+        ShoppingCart cart = shoppingCartRepository.getShoppingCartByUser(userRepository.findByUsername(username));
+        if (cart.getProducts() == null) {
+            cart.setProducts(new HashMap<>());
         }
 
-        boolean checkWarehouse = true;
-        if (checkWarehouse) {
-            ShoppingCart cart = shoppingCartRepository.getShoppingCartByUser(userRepository.findByUsername(username));
-            if (cart.getProducts() == null) {
-                cart.setProducts(new HashMap<>());
-            }
-
-            if (!cart.getProducts().containsKey(UUID.fromString(request.getProductId()))) {
-                throw new NotFoundException("Product not found");
-            }
-
-            cart.getProducts().put(
-                    UUID.fromString(request.getProductId()),
-                    request.getQuantity()
-            );
-            shoppingCartRepository.save(cart);
-            return ShoppingCartMapper.toDto(cart);
+        if (!cart.getProducts().containsKey(UUID.fromString(request.getProductId()))) {
+            throw new NotFoundException("Product not found");
         }
-        return null;
+
+        cart.getProducts().put(
+                UUID.fromString(request.getProductId()),
+                request.getNewQuantity()
+        );
+        warehouseClient.check(ShoppingCartMapper.toDto(cart));
+        shoppingCartRepository.save(cart);
+        return ShoppingCartMapper.toDto(cart);
     }
 
     private void checkUsername(String username) {

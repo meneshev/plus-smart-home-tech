@@ -4,9 +4,7 @@ import dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import util.exception.NotFoundException;
-import util.exception.ValidationException;
-import util.logging.Loggable;
+import util.exception.*;
 import warehouse.dal.entity.WarehouseProduct;
 import warehouse.dal.entity.WarehouseProductId;
 import warehouse.dal.mapper.AddressMapper;
@@ -28,7 +26,6 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final AddressRepository addressRepository;
     private final ProductSpecsRepository productSpecsRepository;
 
-    @Loggable
     @Override
     public AddressDto getAddress() {
         return addressRepository.findById(DEFAULT_WAREHOUSE_ID).stream()
@@ -37,23 +34,21 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .orElseThrow(() -> new NotFoundException("Address not found"));
     }
 
-    @Loggable
     @Override
     public void addNewProduct(NewProductInWarehouseRequest request) {
         UUID productId = UUID.fromString(request.getProductId());
         if (productSpecsRepository.existsByProductId(productId)) {
-            throw new ValidationException(String.format("Product with id %s already exists", productId));
+            throw new SpecifiedProductAlreadyInWarehouseException(String.format("Product with id %s already exists", productId));
         }
         productSpecsRepository.save(ProductSpecsMapper.toEntity(request));
     }
 
-    @Loggable
     @Override
     public void addProduct(AddProductInWarehouseRequest request) {
         UUID productId = UUID.fromString(request.getProductId());
 
         if (!productSpecsRepository.existsByProductId(productId)) {
-            throw new NotFoundException(String.format("Product with id %s not found", productId));
+            throw new NoSpecifiedProductInWarehouseException(String.format("Product with id %s not found", productId));
         }
 
         WarehouseProductId id = WarehouseProductId.builder()
@@ -75,9 +70,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         warehouseProductRepository.save(product.get());
     }
 
-    @Loggable
     @Override
-    public BookedProductsDto check(ShoppingCartDto request) {
+    public BookedProductsDto check(ShoppingCartDto request) throws NoSpecifiedProductInWarehouseException,
+            ProductInShoppingCartLowQuantityInWarehouse {
         Set<UUID> notEnoughProductIds = new HashSet<>();
         Set<WarehouseProductId> currentProductIds = request.getProducts().keySet().stream()
                 .map(uuid -> WarehouseProductId.builder()
@@ -98,14 +93,14 @@ public class WarehouseServiceImpl implements WarehouseService {
                 ));
 
         if (productsInWarehouse.isEmpty() || productsInWarehouse.size() != currentProductIds.size()) {
-            throw new ValidationException("Products from cart not found");
+            throw new NoSpecifiedProductInWarehouseException("Products from cart not found");
         }
 
         AtomicBoolean isFragile = new AtomicBoolean(false);
         request.getProducts().entrySet().forEach(product-> {
             UUID currentId = UUID.fromString(product.getKey());
             WarehouseProduct productFromWarhouse = productsInWarehouse.get(currentId);
-            if (product.getValue() < productFromWarhouse.getQuantity()) {
+            if (product.getValue() > productFromWarhouse.getQuantity()) {
                 notEnoughProductIds.add(currentId);
             } else {
                 if (productFromWarhouse.getProductSpecs().getIsFragile()) {
@@ -124,7 +119,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         });
 
         if (!notEnoughProductIds.isEmpty()) {
-            throw new ValidationException(String.format("Products from cart not enough, IDs: %s",  notEnoughProductIds));
+            throw new ProductInShoppingCartLowQuantityInWarehouse(
+                    String.format("Products from cart not enough, IDs: %s",  notEnoughProductIds));
         }
 
         bookedProductsDto.setFragile(isFragile.get());

@@ -19,5 +19,5 @@ public class ChangeProductQuantityRequest {
     private String productId;
 
     @NotNull
-    private Long quantity;
+    private Long newQuantity;
 }

@@ -8,8 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import util.exception.NotFoundException;
-import util.exception.ValidationException;
+import util.exception.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,6 +77,71 @@ public class ErrorHandler {
         return new ApiError(
                 errors,
                 "Validation error",
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleNoSpecifiedProductInWarehouseException(final NoSpecifiedProductInWarehouseException e) {
+        log.error("Error: {}", e.getMessage(), e);
+
+        List<String> errors = e.getMessage().lines().toList();
+
+        return new ApiError(
+                errors,
+                "Product not found",
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleSpecifiedProductAlreadyInWarehouseException(final SpecifiedProductAlreadyInWarehouseException e) {
+        log.error("Error: {}", e.getMessage(), e);
+
+        List<String> errors = e.getMessage().lines().toList();
+
+        return new ApiError(
+                errors,
+                "Product already in Warehouse",
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleProductInShoppingCartLowQuantityInWarehouse(final ProductInShoppingCartLowQuantityInWarehouse e) {
+        log.error("Error: {}", e.getMessage(), e);
+
+        List<String> errors = e.getMessage().lines().toList();
+
+        return new ApiError(
+                errors,
+                "Product not enough in Warehouse",
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+    }
+
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleHttpMessageCommonException(final Exception e) {
+        log.error("Something went wrong: {}", e.getMessage(), e);
+
+        List<String> errors = e.getMessage().lines().toList();
+
+        return new ApiError(
+                errors,
+                "Error. Check your data",
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now()

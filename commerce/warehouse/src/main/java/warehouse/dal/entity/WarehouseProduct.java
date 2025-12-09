@@ -19,7 +19,6 @@ public class WarehouseProduct {
     private Warehouse warehouse;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    //@MapsId("productId")
     @JoinColumn(name = "Product_id", insertable = false, updatable = false)
     private ProductSpecs productSpecs;
 
