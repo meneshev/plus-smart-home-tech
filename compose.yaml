@@ -49,3 +49,26 @@ services:
       retries: 10
     ports:
       - "5434:5432"
+
+  db-init-sht:
+    image: postgres:16.1
+    container_name: db-init-sht
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: 12345
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -e
+        psql -h postgres -p 5432 -U analyzer.user -d postgres -v ON_ERROR_STOP=1 <<-EOSQL
+        CREATE DATABASE commerce_shopping_cart;
+        CREATE DATABASE commerce_shopping_store;
+        CREATE DATABASE commerce_warehouse;
+        CREATE DATABASE commerce_order;
+        CREATE DATABASE commerce_delivery;
+        CREATE DATABASE commerce_payment;
+        EOSQL
+        echo "Databases created successfully!"
