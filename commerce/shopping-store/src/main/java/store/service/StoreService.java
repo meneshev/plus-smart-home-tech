@@ -1,11 +1,9 @@
 package store.service;
 
-import dto.ProductCategory;
-import dto.ProductDto;
-import dto.SetProductQuantityStateRequest;
+import dto.store.ProductCategory;
+import dto.store.ProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import util.logging.Loggable;
 
 public interface StoreService {
     Page<ProductDto> getProductsByCategory(ProductCategory category, Pageable pageable);

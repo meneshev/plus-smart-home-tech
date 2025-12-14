@@ -2,9 +2,9 @@ package store.dal.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import dto.ProductCategory;
-import dto.ProductState;
-import dto.QuantityState;
+import dto.store.ProductCategory;
+import dto.store.ProductState;
+import dto.store.QuantityState;
 
 import java.util.UUID;
 

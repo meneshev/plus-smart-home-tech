@@ -1,4 +1,4 @@
-package dto;
+package dto.store;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package dto;
+package dto.warehouse;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,16 +8,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 
+import java.util.Map;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChangeProductQuantityRequest {
-
-    @NotBlank
+public class AssemblyProductsForOrderRequest {
     @UUID
-    private String productId;
+    @NotBlank
+    private String orderId;
 
     @NotNull
-    private Long newQuantity;
+    private Map<String, Long> products;
 }

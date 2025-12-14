@@ -1,4 +1,4 @@
-package dto;
+package dto.store;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

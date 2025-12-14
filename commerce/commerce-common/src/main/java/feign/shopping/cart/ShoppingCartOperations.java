@@ -1,7 +1,7 @@
 package feign.shopping.cart;
 
-import dto.ChangeProductQuantityRequest;
-import dto.ShoppingCartDto;
+import dto.cart.ChangeProductQuantityRequest;
+import dto.cart.ShoppingCartDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

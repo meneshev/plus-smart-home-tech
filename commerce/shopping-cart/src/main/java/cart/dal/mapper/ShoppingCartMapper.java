@@ -1,7 +1,7 @@
 package cart.dal.mapper;
 
 import cart.dal.entity.ShoppingCart;
-import dto.ShoppingCartDto;
+import dto.cart.ShoppingCartDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

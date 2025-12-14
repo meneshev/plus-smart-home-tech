@@ -1,6 +1,6 @@
 package warehouse.dal.mapper;
 
-import dto.AddressDto;
+import dto.warehouse.AddressDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import warehouse.dal.entity.Address;

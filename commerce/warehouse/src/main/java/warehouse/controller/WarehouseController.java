@@ -1,6 +1,10 @@
 package warehouse.controller;
 
-import dto.*;
+import dto.cart.ShoppingCartDto;
+import dto.warehouse.AddProductInWarehouseRequest;
+import dto.warehouse.AddressDto;
+import dto.warehouse.BookedProductsDto;
+import dto.warehouse.NewProductInWarehouseRequest;
 import feign.warehouse.WarehouseOperations;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

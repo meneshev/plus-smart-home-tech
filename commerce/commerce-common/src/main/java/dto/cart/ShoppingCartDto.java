@@ -1,6 +1,5 @@
-package dto;
+package dto.cart;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,17 +8,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 
+import java.util.Map;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddProductInWarehouseRequest {
+public class ShoppingCartDto {
 
     @NotBlank
     @UUID
-    private String productId;
+    private String shoppingCartId;
 
     @NotNull
-    @Min(1)
-    private Long quantity;
+    private Map<String, Long> products;
 }

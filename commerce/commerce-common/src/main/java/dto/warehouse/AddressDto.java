@@ -1,4 +1,4 @@
-package dto;
+package dto.warehouse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

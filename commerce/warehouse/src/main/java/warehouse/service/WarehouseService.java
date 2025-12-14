@@ -1,6 +1,10 @@
 package warehouse.service;
 
-import dto.*;
+import dto.cart.ShoppingCartDto;
+import dto.warehouse.AddProductInWarehouseRequest;
+import dto.warehouse.AddressDto;
+import dto.warehouse.BookedProductsDto;
+import dto.warehouse.NewProductInWarehouseRequest;
 
 public interface WarehouseService {
     AddressDto getAddress();

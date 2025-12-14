@@ -1,8 +1,8 @@
 package cart.controller;
 
 import cart.service.ShoppingCartService;
-import dto.ChangeProductQuantityRequest;
-import dto.ShoppingCartDto;
+import dto.cart.ChangeProductQuantityRequest;
+import dto.cart.ShoppingCartDto;
 import feign.shopping.cart.ShoppingCartOperations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

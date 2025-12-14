@@ -1,6 +1,10 @@
 package warehouse.service;
 
-import dto.*;
+import dto.cart.ShoppingCartDto;
+import dto.warehouse.AddProductInWarehouseRequest;
+import dto.warehouse.AddressDto;
+import dto.warehouse.BookedProductsDto;
+import dto.warehouse.NewProductInWarehouseRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

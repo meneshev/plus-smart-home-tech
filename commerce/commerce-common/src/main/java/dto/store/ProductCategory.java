@@ -1,4 +1,4 @@
-package dto;
+package dto.store;
 
 public enum ProductCategory {
     LIGHTING,

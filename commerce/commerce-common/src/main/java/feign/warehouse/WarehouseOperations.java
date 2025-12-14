@@ -1,6 +1,10 @@
 package feign.warehouse;
 
-import dto.*;
+import dto.cart.ShoppingCartDto;
+import dto.warehouse.AddProductInWarehouseRequest;
+import dto.warehouse.AddressDto;
+import dto.warehouse.BookedProductsDto;
+import dto.warehouse.NewProductInWarehouseRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

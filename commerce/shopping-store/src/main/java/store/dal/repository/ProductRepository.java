@@ -1,7 +1,7 @@
 package store.dal.repository;
 
-import dto.ProductCategory;
-import dto.QuantityState;
+import dto.store.ProductCategory;
+import dto.store.QuantityState;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
