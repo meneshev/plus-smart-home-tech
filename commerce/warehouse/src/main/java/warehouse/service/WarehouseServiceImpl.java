@@ -129,16 +129,60 @@ public class WarehouseServiceImpl implements WarehouseService {
         return bookedProductsDto;
     }
 
+    /*
+    Передать товары в доставку*. Метод должен обновить информацию о собранном заказе в базе данных склада:
+    добавить в него идентификатор доставки, который вернул сервис доставки,
+    присвоить идентификатор доставки во внутреннем хранилище собранных товаров заказа.
+    Вызывается из сервиса доставки.
+     */
     @Override
     public void shipToDelivery(ShippedToDeliveryRequest request) {
-        //todo
+        //todo after delivery
     }
 
+    /*
+    Вернуть товар. Если товар возвращается на склад, нужно увеличить остаток.
+    Соответственно, метод принимает список товаров с количеством и увеличивает доступный остаток.
+     */
     @Override
     public void returnProducts(Map<String, Long> products) {
+        // TODO вынести в отдельный private метод проверку на товар на складе
+        Set<WarehouseProductId> currentProductIds = products.keySet().stream()
+                .map(uuid -> WarehouseProductId.builder()
+                        .warehouseId(DEFAULT_WAREHOUSE_ID)
+                        .productId(UUID.fromString(uuid))
+                        .build())
+                .collect(Collectors.toSet());
 
+        Map<UUID, WarehouseProduct> productsInWarehouse = warehouseProductRepository.findAllById(currentProductIds).stream()
+                .collect(Collectors.toMap(
+                        wp -> wp.getId().getProductId(),
+                        wp -> wp
+                ));
+
+        if (productsInWarehouse.isEmpty() || productsInWarehouse.size() != currentProductIds.size()) {
+            throw new NoSpecifiedProductInWarehouseException("Products from cart not found");
+        }
+
+        products.forEach((key, value) -> {
+            WarehouseProductId id = WarehouseProductId.builder()
+                    .warehouseId(DEFAULT_WAREHOUSE_ID)
+                    .productId(UUID.fromString(key))
+                    .build();
+
+            Optional<WarehouseProduct> productDB = warehouseProductRepository.findById(id);
+
+            productDB.get().setQuantity(productDB.get().getQuantity() + value);
+            //TODO подумать насчет транзакций, посмотреть предыдущий вебинар
+            warehouseProductRepository.save(productDB.get());
+        });
     }
 
+    /*
+    Собрать товары для заказа. Метод получает список товаров и идентификатор заказа.
+    По нему повторно проверяется наличие заказанных товаров в нужном количестве,
+    уменьшается их доступный остаток и создаётся сущность «Забронированные для заказа товары» (OrderBooking).
+     */
     @Override
     public BookedProductsDto assembly(AssemblyProductsForOrderRequest request) {
         return null;
