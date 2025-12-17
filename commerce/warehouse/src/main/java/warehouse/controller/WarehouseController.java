@@ -1,10 +1,7 @@
 package warehouse.controller;
 
 import dto.cart.ShoppingCartDto;
-import dto.warehouse.AddProductInWarehouseRequest;
-import dto.warehouse.AddressDto;
-import dto.warehouse.BookedProductsDto;
-import dto.warehouse.NewProductInWarehouseRequest;
+import dto.warehouse.*;
 import feign.warehouse.WarehouseOperations;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import util.logging.Loggable;
 import warehouse.service.WarehouseService;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -45,5 +44,23 @@ public class WarehouseController implements WarehouseOperations {
     @PostMapping("/check")
     public BookedProductsDto check(@Valid @RequestBody ShoppingCartDto request) {
         return warehouseService.check(request);
+    }
+
+    @Loggable
+    @PostMapping("/shipped")
+    public void shipToDelivery(ShippedToDeliveryRequest request) {
+        warehouseService.shipToDelivery(request);
+    }
+
+    @Loggable
+    @PostMapping("/return")
+    public void returnProducts(Map<String, Long> products) {
+        warehouseService.returnProducts(products);
+    }
+
+    @Loggable
+    @PostMapping("/assembly")
+    public BookedProductsDto assemblyProducts(AssemblyProductsForOrderRequest request) {
+        return warehouseService.assembly(request);
     }
 }

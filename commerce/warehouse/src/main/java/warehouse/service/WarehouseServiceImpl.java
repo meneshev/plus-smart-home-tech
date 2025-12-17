@@ -1,10 +1,7 @@
 package warehouse.service;
 
 import dto.cart.ShoppingCartDto;
-import dto.warehouse.AddProductInWarehouseRequest;
-import dto.warehouse.AddressDto;
-import dto.warehouse.BookedProductsDto;
-import dto.warehouse.NewProductInWarehouseRequest;
+import dto.warehouse.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -130,5 +127,20 @@ public class WarehouseServiceImpl implements WarehouseService {
         bookedProductsDto.setFragile(isFragile.get());
 
         return bookedProductsDto;
+    }
+
+    @Override
+    public void shipToDelivery(ShippedToDeliveryRequest request) {
+        //todo
+    }
+
+    @Override
+    public void returnProducts(Map<String, Long> products) {
+
+    }
+
+    @Override
+    public BookedProductsDto assembly(AssemblyProductsForOrderRequest request) {
+        return null;
     }
 }
