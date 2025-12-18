@@ -15,7 +15,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class ProductReturnRequest {
     @UUID
-    private String productId;
+    private String orderId;
 
     @NotNull
     private Map<String, Long> products;

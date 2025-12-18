@@ -17,7 +17,7 @@ import java.util.UUID;
 public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "shoppingcart_id")
+    @Column(name = "shoppingcart_id", columnDefinition = "uuid")
     private UUID shoppingCartId;
 
     @OneToOne(cascade = CascadeType.ALL)

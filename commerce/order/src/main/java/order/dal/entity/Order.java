@@ -20,7 +20,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID orderId;
 
-    // TODO?
+    @Column(columnDefinition = "uuid") //TODO?
     private UUID shoppingCartId;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -34,9 +34,11 @@ public class Order {
     private Map<UUID, Long> products = new HashMap<>();
 
     // TODO?
+    @Column(columnDefinition = "uuid")
     private UUID paymentId;
 
     // TODO?
+    @Column(columnDefinition = "uuid")
     private UUID deliveryId;
 
     @Enumerated(EnumType.STRING)

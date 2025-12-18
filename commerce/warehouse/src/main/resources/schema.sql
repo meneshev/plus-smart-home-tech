@@ -40,3 +40,20 @@ CREATE TABLE IF NOT EXISTS storage.Warehouse_Product (
     Quantity BIGINT NOT NULL,
     PRIMARY KEY (Warehouse_id, Product_id)
 );
+
+--Бронирование товаров
+CREATE TABLE IF NOT EXISTS storage.Booking (
+    Booking_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    Order_id UUID NOT NULL,
+    Delivery_id UUID UNIQUE,
+    Booking_state varchar
+);
+
+--Забронированные для заказа товары
+CREATE TABLE IF NOT EXISTS storage.Booking_Products (
+    Booking_id BIGINT REFERENCES storage.Booking(Booking_id),
+    Product_id UUID NOT NULL,
+    Warehouse_id BIGINT REFERENCES storage.Warehouse(Warehouse_id),
+    Quantity BIGINT NOT NULL,
+    PRIMARY KEY (Booking_id, Product_id, Warehouse_id)
+);
