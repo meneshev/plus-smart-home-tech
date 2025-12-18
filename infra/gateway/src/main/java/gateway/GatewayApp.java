@@ -11,3 +11,6 @@ public class GatewayApp {
         SpringApplication.run(GatewayApp.class, args);
     }
 }
+
+//TODO подключить актуатор к этому проекту и посмотреть роуты (погуглить)
+//TODO включить логирование чтобы видно было запросы

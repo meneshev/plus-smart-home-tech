@@ -46,7 +46,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, mappings, gateway
+  endpoint:
+    gateway:
+      enabled: true # для просмотра gateway/routes
 
 logging:
   level:
