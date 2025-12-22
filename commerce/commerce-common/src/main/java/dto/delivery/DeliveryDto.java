@@ -14,7 +14,6 @@ import org.hibernate.validator.constraints.UUID;
 @AllArgsConstructor
 public class DeliveryDto {
     @UUID
-    @NotBlank
     private String deliveryId;
 
     @NotBlank

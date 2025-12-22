@@ -11,8 +11,8 @@ import org.hibernate.validator.constraints.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductIdDto {
+public class UUIDBodyDto {
     @NotBlank
     @UUID
-    private String productId;
+    private String id;
 }

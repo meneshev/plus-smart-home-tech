@@ -5,7 +5,7 @@ import dto.order.CreateNewOrderRequest;
 import dto.order.OrderDto;
 import dto.order.OrderState;
 import dto.order.ProductReturnRequest;
-import dto.store.ProductIdDto;
+import dto.store.UUIDBodyDto;
 import feign.shopping.cart.ShoppingCartClient;
 import feign.warehouse.WarehouseClient;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDto> getOrders(String username) {
         ShoppingCartDto cart = shoppingCartClient.getCart(username);
         //return
-        orderRepository.findAllByShoppingCartId(UUID.fromString(cart.getShoppingCartId()));
+        //orderRepository.findAllByShoppingCartId(UUID.fromString(cart.getShoppingCartId()));
         // get delivery
         // get payment
         // mapToDto
@@ -62,47 +62,47 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto payOrder(ProductIdDto productId) {
+    public OrderDto payOrder(UUIDBodyDto productId) {
         return null;
     }
 
     @Override
-    public OrderDto payOrderFailed(ProductIdDto productId) {
+    public OrderDto payOrderFailed(UUIDBodyDto productId) {
         return null;
     }
 
     @Override
-    public OrderDto deliveryOrder(ProductIdDto productId) {
+    public OrderDto deliveryOrder(UUIDBodyDto productId) {
         return null;
     }
 
     @Override
-    public OrderDto deliveryOrderFailed(ProductIdDto productId) {
+    public OrderDto deliveryOrderFailed(UUIDBodyDto productId) {
         return null;
     }
 
     @Override
-    public OrderDto completeOrder(ProductIdDto productId) {
+    public OrderDto completeOrder(UUIDBodyDto productId) {
         return null;
     }
 
     @Override
-    public OrderDto calculateTotalOrder(ProductIdDto productId) {
+    public OrderDto calculateTotalOrder(UUIDBodyDto productId) {
         return null;
     }
 
     @Override
-    public OrderDto calculateDeliveryOrder(ProductIdDto productId) {
+    public OrderDto calculateDeliveryOrder(UUIDBodyDto productId) {
         return null;
     }
 
     @Override
-    public OrderDto assemblyOrder(ProductIdDto productId) {
+    public OrderDto assemblyOrder(UUIDBodyDto productId) {
         return null;
     }
 
     @Override
-    public OrderDto assemblyOrderFailed(ProductIdDto productId) {
+    public OrderDto assemblyOrderFailed(UUIDBodyDto productId) {
         return null;
     }
 }

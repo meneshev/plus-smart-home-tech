@@ -2,7 +2,7 @@ package store.controller;
 
 import dto.store.ProductCategory;
 import dto.store.ProductDto;
-import dto.store.ProductIdDto;
+import dto.store.UUIDBodyDto;
 import feign.shopping.store.ShoppingStoreOperations;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class StoreController implements ShoppingStoreOperations {
 
     @Loggable
     @PostMapping("/removeProductFromStore")
-    public boolean removeProduct(@RequestBody ProductIdDto productIdDto) {
+    public boolean removeProduct(@RequestBody UUIDBodyDto productIdDto) {
         return storeService.removeProduct(productIdDto.getProductId());
     }
 

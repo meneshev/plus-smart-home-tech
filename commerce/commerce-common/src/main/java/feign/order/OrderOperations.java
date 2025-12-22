@@ -3,7 +3,7 @@ package feign.order;
 import dto.order.CreateNewOrderRequest;
 import dto.order.OrderDto;
 import dto.order.ProductReturnRequest;
-import dto.store.ProductIdDto;
+import dto.store.UUIDBodyDto;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,29 +20,29 @@ public interface OrderOperations {
     OrderDto returnOrder(@RequestBody @Valid ProductReturnRequest request);
 
     @PostMapping("/payment")
-    OrderDto payOrder(@RequestBody @Valid ProductIdDto productId);
+    OrderDto payOrder(@RequestBody @Valid UUIDBodyDto productId);
 
     @PostMapping("/payment/failed")
-    OrderDto payOrderFailed(@RequestBody @Valid ProductIdDto productId);
+    OrderDto payOrderFailed(@RequestBody @Valid UUIDBodyDto productId);
 
     @PostMapping("/delivery")
-    OrderDto deliveryOrder(@RequestBody @Valid ProductIdDto productId);
+    OrderDto deliveryOrder(@RequestBody @Valid UUIDBodyDto productId);
 
     @PostMapping("/delivery/failed")
-    OrderDto deliveryOrderFailed(@RequestBody @Valid ProductIdDto productId);
+    OrderDto deliveryOrderFailed(@RequestBody @Valid UUIDBodyDto productId);
 
     @PostMapping("/completed")
-    OrderDto completedOrder(@RequestBody @Valid ProductIdDto productId);
+    OrderDto completedOrder(@RequestBody @Valid UUIDBodyDto productId);
 
     @PostMapping("/calculate/total")
-    OrderDto calculateTotalOrder(@RequestBody @Valid ProductIdDto productId);
+    OrderDto calculateTotalOrder(@RequestBody @Valid UUIDBodyDto productId);
 
     @PostMapping("/calculate/delivery")
-    OrderDto calculateDeliveryOrder(@RequestBody @Valid ProductIdDto productId);
+    OrderDto calculateDeliveryOrder(@RequestBody @Valid UUIDBodyDto productId);
 
     @PostMapping("/assembly")
-    OrderDto assemblyOrder(@RequestBody @Valid ProductIdDto productId);
+    OrderDto assemblyOrder(@RequestBody @Valid UUIDBodyDto productId);
 
     @PostMapping("/assembly/failed")
-    OrderDto assemblyOrderFailed(@RequestBody @Valid ProductIdDto productId);
+    OrderDto assemblyOrderFailed(@RequestBody @Valid UUIDBodyDto productId);
 }

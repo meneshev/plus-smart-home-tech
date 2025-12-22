@@ -3,7 +3,7 @@ package order.controller;
 import dto.order.CreateNewOrderRequest;
 import dto.order.OrderDto;
 import dto.order.ProductReturnRequest;
-import dto.store.ProductIdDto;
+import dto.store.UUIDBodyDto;
 import feign.order.OrderOperations;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,55 +41,55 @@ public class OrderController implements OrderOperations {
 
     @PostMapping("/payment")
     @Loggable
-    public OrderDto payOrder(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto payOrder(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.payOrder(productId);
     }
 
     @PostMapping("/payment/failed")
     @Loggable
-    public OrderDto payOrderFailed(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto payOrderFailed(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.payOrderFailed(productId);
     }
 
     @PostMapping("/delivery")
     @Loggable
-    public OrderDto deliveryOrder(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto deliveryOrder(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.deliveryOrder(productId);
     }
 
     @PostMapping("/delivery/failed")
     @Loggable
-    public OrderDto deliveryOrderFailed(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto deliveryOrderFailed(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.deliveryOrderFailed(productId);
     }
 
     @PostMapping("/completed")
     @Loggable
-    public OrderDto completedOrder(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto completedOrder(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.completeOrder(productId);
     }
 
     @PostMapping("/calculate/total")
     @Loggable
-    public OrderDto calculateTotalOrder(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto calculateTotalOrder(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.calculateTotalOrder(productId);
     }
 
     @PostMapping("/calculate/delivery")
     @Loggable
-    public OrderDto calculateDeliveryOrder(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto calculateDeliveryOrder(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.calculateDeliveryOrder(productId);
     }
 
     @PostMapping("/assembly")
     @Loggable
-    public OrderDto assemblyOrder(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto assemblyOrder(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.assemblyOrder(productId);
     }
 
     @PostMapping("/assembly/failed")
     @Loggable
-    public OrderDto assemblyOrderFailed(@RequestBody @Valid ProductIdDto productId) {
+    public OrderDto assemblyOrderFailed(@RequestBody @Valid UUIDBodyDto productId) {
         return orderService.assemblyOrderFailed(productId);
     }
 }
