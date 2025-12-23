@@ -14,11 +14,10 @@ import payment.dal.entity.Payment;
 import payment.dal.mapper.PaymentMapper;
 import payment.dal.repository.PaymentRepository;
 import util.exception.NotFoundException;
-import util.exception.ValidationException;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -30,29 +29,30 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final double VAT = 0.1;
 
-    //TODO доделать payment, затем order
-
     @Override
     public PaymentDto createPayment(OrderDto order) {
-        if (paymentRepository.getPaymentByOrderId(UUID.fromString(order.getOrderId()))) {
-            log.info("Payment already exists for order {}", order.getOrderId());
-            throw new ValidationException("Payment already exists for order " + order.getOrderId());
-            // TODO либо просто пересчитываем стоимость?
+        Optional<Payment> payment = paymentRepository.findPaymentByOrderId(UUID.fromString(order.getOrderId()));
+        if (payment.isPresent()) {
+            log.info("Payment already exists for order {}, updating payment...", order.getOrderId());
+            payment.get().setOrderId(UUID.fromString(order.getOrderId()));
+            payment.get().setProductPrice(getProductCost(order));
+            payment.get().setDeliveryPrice(deliveryClient.createCost(order));
+            payment.get().setTotalPrice(getTotalCost(order));
+            payment.get().setState(PaymentState.PENDING);
+
+        } else {
+            log.info("Creating payment for order {}", order.getOrderId());
+            payment = Optional.ofNullable(Payment.builder()
+                    .orderId(UUID.fromString(order.getOrderId()))
+                    .productPrice(getProductCost(order))
+                    .deliveryPrice(deliveryClient.createCost(order))
+                    .totalPrice(getTotalCost(order))
+                    .state(PaymentState.PENDING)
+                    .build());
         }
 
-        Payment newPayment = Payment.builder()
-                .orderId(UUID.fromString(order.getOrderId()))
-                .productPrice(getProductCost(order))
-                .deliveryPrice(deliveryClient.createCost(order))
-                .totalPrice(getTotalCost(order))
-                .state(PaymentState.PENDING)
-                .build();
-
-        paymentRepository.save(newPayment);
-
-        log.info("Payment created for order {}", order.getOrderId());
-
-        return PaymentMapper.toDto(newPayment);
+        paymentRepository.save(payment.get());
+        return PaymentMapper.toDto(payment.get());
     }
 
     @Override
@@ -72,6 +72,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void refund(UUIDBodyDto paymentId) {
         checkPayment(UUID.fromString(paymentId.getId()));
+        Payment payment = paymentRepository.getPaymentByPaymentId(UUID.fromString(paymentId.getId()));
+        payment.setState(PaymentState.SUCCESS);
+        paymentRepository.save(payment);
+        log.info("Payment refund for order {}", payment.getOrderId());
     }
 
     @Override
@@ -82,6 +86,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void failed(UUIDBodyDto paymentId) {
         checkPayment(UUID.fromString(paymentId.getId()));
+        Payment payment = paymentRepository.getPaymentByPaymentId(UUID.fromString(paymentId.getId()));
+        payment.setState(PaymentState.FAILED);
+        paymentRepository.save(payment);
+        log.info("Payment failed for order {}", payment.getOrderId());
     }
 
     // стоимость товаров
@@ -99,8 +107,5 @@ public class PaymentServiceImpl implements PaymentService {
             log.info("Payment not found with id {}", paymentId);
             throw new NotFoundException("Payment not found with id " + paymentId);
         }
-    }
-
-    private void checkOrder(UUID orderId) {
     }
 }
