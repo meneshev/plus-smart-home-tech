@@ -26,6 +26,12 @@ public class DeliveryController implements DeliveryOperations {
     }
 
     @Loggable
+    @GetMapping
+    public DeliveryDto getDelivery(@Valid @RequestBody UUIDBodyDto deliveryId) {
+        return deliveryService.getDelivery(deliveryId);
+    }
+
+    @Loggable
     @PostMapping("/successful")
     public void successfulDelivery(@Valid @RequestBody UUIDBodyDto deliveryId) {
         deliveryService.success(deliveryId);

@@ -15,6 +15,10 @@ public final class DeliveryMapper {
                 .toAddress(DeliveryAddressMapper.toDto(delivery.getToAddress()))
                 .deliveryState(delivery.getState().toString())
                 .orderId(delivery.getOrderId().toString())
+                .deliveryWeight(delivery.getDeliveryWeight() != null ? delivery.getDeliveryWeight() : null)
+                .deliveryVolume(delivery.getDeliveryVolume() != null ? delivery.getDeliveryVolume() : null)
+                .fragile(delivery.isFragile())
+                .deliveryPrice(delivery.getDeliveryPrice() != null ? delivery.getDeliveryPrice() : null)
                 .build();
     }
 }

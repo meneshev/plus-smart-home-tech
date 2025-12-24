@@ -1,5 +1,6 @@
 package dto.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ public class OrderDto {
     @UUID
     private String deliveryId;
 
-    //TODO valid enum?
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String orderState;
 
     private Double deliveryWeight;

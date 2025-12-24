@@ -29,6 +29,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final double VAT = 0.1;
 
+    //TODO: проверить ошибки по orderClient, deliveryClient. проверить вызов всех новых эндпоинтов
+
     @Override
     public PaymentDto createPayment(OrderDto order) {
         Optional<Payment> payment = paymentRepository.findPaymentByOrderId(UUID.fromString(order.getOrderId()));
@@ -75,6 +77,11 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.getPaymentByPaymentId(UUID.fromString(paymentId.getId()));
         payment.setState(PaymentState.SUCCESS);
         paymentRepository.save(payment);
+
+        orderClient.payOrder((UUIDBodyDto.builder()
+                .id(paymentId.getId())
+                .build()));
+
         log.info("Payment refund for order {}", payment.getOrderId());
     }
 
@@ -89,6 +96,11 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.getPaymentByPaymentId(UUID.fromString(paymentId.getId()));
         payment.setState(PaymentState.FAILED);
         paymentRepository.save(payment);
+
+        orderClient.payOrderFailed(UUIDBodyDto.builder()
+                        .id(paymentId.getId())
+                        .build());
+
         log.info("Payment failed for order {}", payment.getOrderId());
     }
 

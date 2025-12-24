@@ -15,4 +15,6 @@ public interface DeliveryService {
     void failed(@Valid UUIDBodyDto deliveryId);
 
     Double getCost(@Valid OrderDto orderDto);
+
+    DeliveryDto getDelivery(@Valid UUIDBodyDto deliveryId);
 }

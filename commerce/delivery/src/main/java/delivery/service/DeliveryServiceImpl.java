@@ -123,7 +123,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         delivery.setState(DeliveryState.FAILED);
         deliveryRepository.save(delivery);
 
-        orderClient.assemblyOrder(
+        orderClient.deliveryOrderFailed(
                 UUIDBodyDto.builder()
                         .id(delivery.getOrderId().toString())
                         .build()
@@ -160,6 +160,13 @@ public class DeliveryServiceImpl implements DeliveryService {
         }
 
         return cost;
+    }
+
+    @Override
+    public DeliveryDto getDelivery(UUIDBodyDto deliveryId) {
+        checkDelivery(UUID.fromString(deliveryId.getId()));
+        Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId.getId())).get();
+        return DeliveryMapper.toDto(delivery);
     }
 
     private void checkDelivery(UUID deliveryId) {

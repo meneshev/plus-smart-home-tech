@@ -4,6 +4,7 @@ import dto.delivery.DeliveryDto;
 import dto.order.OrderDto;
 import dto.store.UUIDBodyDto;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,4 +25,7 @@ public interface DeliveryOperations {
 
     @PostMapping("/cost")
     Double createCost(@Valid @RequestBody OrderDto orderDto);
+
+    @GetMapping
+    DeliveryDto getDelivery(@Valid @RequestBody UUIDBodyDto deliveryId);
 }
