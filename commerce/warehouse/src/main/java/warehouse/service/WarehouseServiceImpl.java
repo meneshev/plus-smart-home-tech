@@ -12,6 +12,8 @@ import warehouse.dal.mapper.AddressMapper;
 import warehouse.dal.mapper.ProductSpecsMapper;
 import warehouse.dal.repository.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -123,7 +125,6 @@ public class WarehouseServiceImpl implements WarehouseService {
             Optional<WarehouseProduct> productDB = warehouseProductRepository.findById(id);
 
             productDB.get().setQuantity(productDB.get().getQuantity() + value);
-            //TODO подумать насчет транзакций, посмотреть предыдущий вебинар
             warehouseProductRepository.save(productDB.get());
         });
     }
@@ -139,7 +140,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         checkProductQuantity(request.getProducts(), productsInWarehouse);
 
         productsInWarehouse.forEach((uuid, product) -> {
-            Long qtFromOrder = request.getProducts().get(uuid);
+            Long qtFromOrder = request.getProducts().get(uuid.toString());
             Long qtFromWh = product.getQuantity();
 
             product.setQuantity(qtFromWh - qtFromOrder);
@@ -224,7 +225,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private void checkProductQuantity(Map<String, Long> products, Map<UUID, WarehouseProduct> productsInWarehouse) throws NotEnoughProductException {
         Set<UUID> notEnoughProductIds = new HashSet<>();
         products.forEach((uuid, qt) -> {
-            if (productsInWarehouse.get(uuid).getQuantity() < qt) {
+            if (productsInWarehouse.get(UUID.fromString(uuid)).getQuantity() < qt) {
                 notEnoughProductIds.add(UUID.fromString(uuid));
             }
         });
@@ -260,6 +261,16 @@ public class WarehouseServiceImpl implements WarehouseService {
             );
         });
 
+        double roundedWeight = BigDecimal.valueOf(bookedProductsDto.getDeliveryWeight())
+                                .setScale(2, RoundingMode.HALF_UP)
+                                .doubleValue();
+
+        double roundedVolume = BigDecimal.valueOf(bookedProductsDto.getDeliveryVolume())
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+
+        bookedProductsDto.setDeliveryWeight(roundedWeight);
+        bookedProductsDto.setDeliveryVolume(roundedVolume);
         bookedProductsDto.setFragile(isFragile.get());
         return bookedProductsDto;
     }

@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,15 +73,15 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .toAddress(to.get())
                 .orderId(UUID.fromString(deliveryDto.getOrderId()))
                 .state(DeliveryState.CREATED)
+                .fragile(deliveryDto.isFragile())
+                .deliveryVolume(deliveryDto.getDeliveryVolume())
+                .deliveryWeight(deliveryDto.getDeliveryWeight())
                 .build();
+
+
 
         deliveryRepository.save(delivery);
 
-        orderClient.assemblyOrder(
-                UUIDBodyDto.builder()
-                        .id(deliveryDto.getOrderId())
-                        .build()
-        );
         log.info("Delivery:{} for order:{} was created", delivery.getDeliveryId(), delivery.getOrderId());
 
         return DeliveryMapper.toDto(delivery);
@@ -158,14 +160,18 @@ public class DeliveryServiceImpl implements DeliveryService {
                 && delivery.getFromAddress().getStreet().equals(delivery.getToAddress().getStreet()))) {
             cost += cost * 0.2;
         }
+        cost = BigDecimal.valueOf(cost).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+
+        delivery.setDeliveryPrice(cost);
+        deliveryRepository.save(delivery);
 
         return cost;
     }
 
     @Override
-    public DeliveryDto getDelivery(UUIDBodyDto deliveryId) {
-        checkDelivery(UUID.fromString(deliveryId.getId()));
-        Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId.getId())).get();
+    public DeliveryDto getDelivery(String deliveryId) {
+        checkDelivery(UUID.fromString(deliveryId));
+        Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId)).get();
         return DeliveryMapper.toDto(delivery);
     }
 

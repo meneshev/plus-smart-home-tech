@@ -48,19 +48,19 @@ public class WarehouseController implements WarehouseOperations {
 
     @Loggable
     @PostMapping("/shipped")
-    public void shipToDelivery(ShippedToDeliveryRequest request) {
+    public void shipToDelivery(@Valid @RequestBody ShippedToDeliveryRequest request) {
         warehouseService.shipToDelivery(request);
     }
 
     @Loggable
     @PostMapping("/return")
-    public void returnProducts(Map<String, Long> products) {
+    public void returnProducts(@RequestBody Map<String, Long> products) {
         warehouseService.returnProducts(products);
     }
 
     @Loggable
     @PostMapping("/assembly")
-    public BookedProductsDto assemblyProducts(AssemblyProductsForOrderRequest request) {
+    public BookedProductsDto assemblyProducts(@Valid @RequestBody AssemblyProductsForOrderRequest request) {
         return warehouseService.assembly(request);
     }
 }

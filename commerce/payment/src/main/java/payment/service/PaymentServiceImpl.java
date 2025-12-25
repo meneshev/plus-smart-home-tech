@@ -15,6 +15,8 @@ import payment.dal.mapper.PaymentMapper;
 import payment.dal.repository.PaymentRepository;
 import util.exception.NotFoundException;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final double VAT = 0.1;
 
-    //TODO: проверить ошибки по orderClient, deliveryClient. проверить вызов всех новых эндпоинтов
+    //TODO: проверить вызов всех новых эндпоинтов
 
     @Override
     public PaymentDto createPayment(OrderDto order) {
@@ -53,6 +55,8 @@ public class PaymentServiceImpl implements PaymentService {
                     .build());
         }
 
+        payment.get().setFeePrice(getProductTotal(order.getProducts()) * VAT);
+
         paymentRepository.save(payment.get());
         return PaymentMapper.toDto(payment.get());
     }
@@ -61,6 +65,8 @@ public class PaymentServiceImpl implements PaymentService {
     public Double getTotalCost(OrderDto order) {
         Double total = getProductTotal(order.getProducts());
 
+
+
         // НДС
         total += total * VAT;
 
@@ -68,7 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
         Double deliveryCost = deliveryClient.createCost(order);
         total += deliveryCost;
 
-        return total;
+        return BigDecimal.valueOf(total).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     @Override
@@ -79,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
 
         orderClient.payOrder((UUIDBodyDto.builder()
-                .id(paymentId.getId())
+                .id(payment.getOrderId().toString())
                 .build()));
 
         log.info("Payment refund for order {}", payment.getOrderId());
@@ -87,7 +93,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Double getProductCost(OrderDto order) {
-        return getProductTotal(order.getProducts());
+        return BigDecimal.valueOf(getProductTotal(order.getProducts()))
+                .setScale(2, RoundingMode.HALF_EVEN)
+                .doubleValue();
     }
 
     @Override
@@ -98,7 +106,7 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
 
         orderClient.payOrderFailed(UUIDBodyDto.builder()
-                        .id(paymentId.getId())
+                        .id(payment.getOrderId().toString())
                         .build());
 
         log.info("Payment failed for order {}", payment.getOrderId());

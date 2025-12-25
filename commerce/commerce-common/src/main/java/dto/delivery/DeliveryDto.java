@@ -3,6 +3,7 @@ package dto.delivery;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dto.warehouse.AddressDto;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class DeliveryDto {
 
     private AddressDto fromAddress;
 
-    @NotBlank
+    @NotNull
     private AddressDto toAddress;
 
     @UUID
@@ -29,15 +30,11 @@ public class DeliveryDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String deliveryState;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Double deliveryWeight;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Double deliveryVolume;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean fragile;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Double deliveryPrice;
 }

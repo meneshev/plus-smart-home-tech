@@ -10,7 +10,7 @@ import java.util.Map;
 public interface ShoppingCartOperations {
 
     @PutMapping
-    ShoppingCartDto addToCart(@RequestBody String username, @RequestBody Map<String, Long> products);
+    ShoppingCartDto addToCart(@RequestParam String username, @RequestBody Map<String, Long> products);
 
     @GetMapping
     ShoppingCartDto getCart(@RequestParam String username);

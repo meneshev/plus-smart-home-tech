@@ -34,11 +34,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-    private OrderRepository orderRepository;
-    private ShoppingCartClient shoppingCartClient;
-    private WarehouseClient warehouseClient;
-    private DeliveryClient deliveryClient;
-    private PaymentClient paymentClient;
+    private final OrderRepository orderRepository;
+    private final ShoppingCartClient shoppingCartClient;
+    private final WarehouseClient warehouseClient;
+    private final DeliveryClient deliveryClient;
+    private final PaymentClient paymentClient;
 
     @Override
     public List<OrderDto> getOrders(String username) {
@@ -57,15 +57,13 @@ public class OrderServiceImpl implements OrderService {
         return orders.stream()
                 .map(dbOrder -> {
                     OrderDto orderDto = OrderMapper.toDto(dbOrder);
-                    DeliveryDto deliveryData = deliveryClient.getDelivery(UUIDBodyDto.builder()
-                                    .id(orderDto.getDeliveryId())
-                                    .build());
+                    DeliveryDto deliveryData = deliveryClient.getDelivery(orderDto.getDeliveryId());
 
                     if (deliveryData == null) {
                         log.error("Delivery data not found for order {}", orderDto.getOrderId());
                     } else {
                         orderDto.setDeliveryWeight(deliveryData.getDeliveryWeight());
-                        orderDto.setDeliveryPrice(deliveryData.getDeliveryVolume());
+                        orderDto.setDeliveryVolume(deliveryData.getDeliveryVolume());
                         orderDto.setFragile(deliveryData.isFragile());
                         orderDto.setDeliveryPrice(deliveryData.getDeliveryPrice());
                     }
@@ -109,6 +107,9 @@ public class OrderServiceImpl implements OrderService {
                         .orderId(newOrder.getOrderId().toString())
                         .fromAddress(whAddress)
                         .toAddress(request.getDeliveryAddress())
+                        .fragile(deliveryInfo.getFragile())
+                        .deliveryVolume(deliveryInfo.getDeliveryVolume())
+                        .deliveryWeight(deliveryInfo.getDeliveryWeight())
                         .build()
         );
 
@@ -128,6 +129,10 @@ public class OrderServiceImpl implements OrderService {
             log.error("Payment for order:{} wasn't created",  orderDto.getOrderId());
             throw new RuntimeException("Payment wasn't created");
         }
+        newOrder.setDeliveryId(UUID.fromString(delivery.getDeliveryId()));
+        newOrder.setPaymentId(UUID.fromString(payment.getPaymentId()));
+        orderRepository.save(newOrder);
+
         orderDto.setPaymentId(payment.getPaymentId());
         orderDto.setTotalPrice(payment.getTotalPayment());
         orderDto.setDeliveryPrice(payment.getDeliveryTotal());
@@ -144,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderState(OrderState.PRODUCT_RETURNED);
         orderRepository.save(order);
         log.info("Order:{} has been returned", order.getOrderId());
-        return OrderMapper.toDto(order);
+        return enrichOrderDto(OrderMapper.toDto(order));
     }
 
     @Override
@@ -154,7 +159,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderState(OrderState.PAID);
         orderRepository.save(order);
         log.info("Order:{} has been payed", order.getOrderId());
-        return OrderMapper.toDto(order);
+        return enrichOrderDto(OrderMapper.toDto(order));
     }
 
     @Override
@@ -164,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderState(OrderState.PAYMENT_FAILED);
         orderRepository.save(order);
         log.info("Order:{} payment has been failed", order.getOrderId());
-        return OrderMapper.toDto(order);
+        return enrichOrderDto(OrderMapper.toDto(order));
     }
 
     @Override
@@ -174,7 +179,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderState(OrderState.DELIVERED);
         orderRepository.save(order);
         log.info("Order:{} delivery has been successful", order.getOrderId());
-        return OrderMapper.toDto(order);
+        return enrichOrderDto(OrderMapper.toDto(order));
     }
 
     @Override
@@ -184,7 +189,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderState(OrderState.DELIVERY_FAILED);
         orderRepository.save(order);
         log.info("Order:{} delivery has been failed", order.getOrderId());
-        return OrderMapper.toDto(order);
+        return enrichOrderDto(OrderMapper.toDto(order));
     }
 
     @Override
@@ -194,14 +199,14 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderState(OrderState.COMPLETED);
         orderRepository.save(order);
         log.info("Order:{} has been completed", order.getOrderId());
-        return OrderMapper.toDto(order);
+        return enrichOrderDto(OrderMapper.toDto(order));
     }
 
     @Override
     public OrderDto calculateTotalOrder(UUIDBodyDto orderId) {
         checkOrder(orderId.getId());
         OrderDto orderDto = OrderMapper.toDto(orderRepository.getReferenceById(UUID.fromString(orderId.getId())));
-        orderDto.setTotalPrice(paymentClient.getTotalCost(orderDto));
+        orderDto.setTotalPrice(paymentClient.getTotalCost(enrichOrderDto(orderDto)));
 
         return orderDto;
     }
@@ -210,7 +215,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto calculateDeliveryOrder(UUIDBodyDto orderId) {
         checkOrder(orderId.getId());
         OrderDto orderDto = OrderMapper.toDto(orderRepository.getReferenceById(UUID.fromString(orderId.getId())));
-        orderDto.setDeliveryPrice(deliveryClient.createCost(orderDto));
+        orderDto.setDeliveryPrice(deliveryClient.createCost(enrichOrderDto(orderDto)));
 
         return orderDto;
     }
@@ -224,7 +229,7 @@ public class OrderServiceImpl implements OrderService {
                         .orderId(orderId.getId())
                         .products(order.getProducts().entrySet().stream()
                                 .collect(Collectors.toMap(
-                                        Object::toString,
+                                        entry -> entry.getKey().toString(),
                                         Map.Entry::getValue
                                 ))
                         )
@@ -234,7 +239,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
         log.info("Order:{} has been assembled", order.getOrderId());
-        return OrderMapper.toDto(order);
+        return enrichOrderDto(OrderMapper.toDto(order));
     }
 
     @Override
@@ -244,11 +249,25 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderState(OrderState.ASSEMBLY_FAILED);
         orderRepository.save(order);
         log.info("Order:{} assembly has been failed", order.getOrderId());
-        return OrderMapper.toDto(order);
+        return enrichOrderDto(OrderMapper.toDto(order));
     }
 
     private void checkOrder(String orderId) {
         orderRepository.findById(UUID.fromString(orderId))
                 .orElseThrow(() -> new NoOrderFoundException(String.format("OrderId:%s not found", orderId)));
+    }
+
+    private OrderDto enrichOrderDto(OrderDto orderDto) {
+        DeliveryDto deliveryData = deliveryClient.getDelivery(orderDto.getDeliveryId());
+
+        orderDto.setDeliveryPrice(deliveryData.getDeliveryPrice());
+        orderDto.setDeliveryWeight(deliveryData.getDeliveryWeight());
+        orderDto.setDeliveryVolume(deliveryData.getDeliveryVolume());
+        orderDto.setFragile(deliveryData.isFragile());
+
+        orderDto.setTotalPrice(paymentClient.getTotalCost(orderDto));
+        orderDto.setProductPrice(paymentClient.getProductCost(orderDto));
+
+        return orderDto;
     }
 }

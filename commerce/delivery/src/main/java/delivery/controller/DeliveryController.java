@@ -26,8 +26,8 @@ public class DeliveryController implements DeliveryOperations {
     }
 
     @Loggable
-    @GetMapping
-    public DeliveryDto getDelivery(@Valid @RequestBody UUIDBodyDto deliveryId) {
+    @GetMapping("/{deliveryId}")
+    public DeliveryDto getDelivery(@PathVariable String deliveryId) {
         return deliveryService.getDelivery(deliveryId);
     }
 

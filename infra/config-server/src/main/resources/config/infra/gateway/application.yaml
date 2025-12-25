@@ -35,12 +35,40 @@ spring:
               args:
                 retries: 3 # количество повторных попыток
                 exceptions: util.exception.ProductNotFoundException # попытки только для этого исключения + по умолчанию для IOException, TimeoutException, RetryException
-                methods: GET, POST # только для этих методов
+                methods: GET, POST, PUT # только для этих методов
                 backoff:
                   firstBackoff: 250ms # задержка перед первой повторной попыткой
                   maxBackoff: 500ms # максимальная задержка между попытками
                   factor: 2 # множитель для экспоненциального роста задержки
                   basedOnPreviousValue: false # каждая задержка рассчитывается на основе предыдущей задержки
+
+        - id: payment_service_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - PrefixPath=/api/v1
+
+        - id: delivery_service_route
+          uri: lb://delivery
+          predicates:
+            - Path=/delivery/**
+          filters:
+            - PrefixPath=/api/v1
+
+        - id: warehouse_service_route
+          uri: lb://warehouse
+          predicates:
+            - Path=/warehouse/**
+          filters:
+            - PrefixPath=/api/v1
+
+        - id: order_service_route
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+          filters:
+            - PrefixPath=/api/v1
 
 management:
   endpoints:

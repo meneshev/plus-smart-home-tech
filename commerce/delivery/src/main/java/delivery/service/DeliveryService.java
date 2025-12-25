@@ -16,5 +16,5 @@ public interface DeliveryService {
 
     Double getCost(@Valid OrderDto orderDto);
 
-    DeliveryDto getDelivery(@Valid UUIDBodyDto deliveryId);
+    DeliveryDto getDelivery(String deliveryId);
 }

@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "storage", name = "DeliveryAddress")
+@Table(schema = "delivery", name = "DeliveryAddress")
 public class DeliveryAddress {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -28,7 +28,7 @@ public interface WarehouseOperations {
     void shipToDelivery(@Valid @RequestBody ShippedToDeliveryRequest request);
 
     @PostMapping("/return")
-    void returnProducts(Map<String, Long> products);
+    void returnProducts(@RequestBody Map<String, Long> products);
 
     @PostMapping("/assembly")
     BookedProductsDto assemblyProducts(@Valid @RequestBody AssemblyProductsForOrderRequest request);

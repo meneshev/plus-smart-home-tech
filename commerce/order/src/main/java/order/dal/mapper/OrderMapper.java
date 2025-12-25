@@ -1,8 +1,6 @@
 package order.dal.mapper;
 
-import dto.delivery.DeliveryDto;
 import dto.order.OrderDto;
-import dto.payment.PaymentDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import order.dal.entity.Order;

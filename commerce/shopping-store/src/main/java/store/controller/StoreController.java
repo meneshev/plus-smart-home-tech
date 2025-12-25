@@ -48,7 +48,7 @@ public class StoreController implements ShoppingStoreOperations {
     @Loggable
     @PostMapping("/removeProductFromStore")
     public boolean removeProduct(@RequestBody UUIDBodyDto productIdDto) {
-        return storeService.removeProduct(productIdDto.getProductId());
+        return storeService.removeProduct(productIdDto.getId());
     }
 
     @Loggable

@@ -7,12 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress, Long> {
-    @Query("SELECT DeliveryAddress from DeliveryAddress " +
+    @Query("SELECT d from DeliveryAddress d " +
             "where 1=1 " +
-            "and DeliveryAddress.country = country " +
-            "and DeliveryAddress.city = city " +
-            "and DeliveryAddress.street = street " +
-            "and DeliveryAddress.house = house " +
-            "and DeliveryAddress.flat = flat")
+            "and d.country = :country " +
+            "and d.city = :city " +
+            "and d.street = :street " +
+            "and d.house = :house " +
+            "and d.flat = :flat")
     Optional<DeliveryAddress> findAddress(String country, String city, String street, String house, String flat);
 }
