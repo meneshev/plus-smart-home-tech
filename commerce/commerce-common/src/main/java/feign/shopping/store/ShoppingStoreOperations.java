@@ -1,8 +1,8 @@
 package feign.shopping.store;
 
-import dto.ProductCategory;
-import dto.ProductDto;
-import dto.ProductIdDto;
+import dto.store.ProductCategory;
+import dto.store.ProductDto;
+import dto.store.UUIDBodyDto;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +20,7 @@ public interface ShoppingStoreOperations {
     ProductDto createProduct(@RequestBody @Valid ProductDto product);
 
     @PostMapping("/removeProductFromStore")
-    boolean removeProduct(@RequestBody ProductIdDto productIdDto);
+    boolean removeProduct(@RequestBody UUIDBodyDto productIdDto);
 
     @PostMapping("/quantityState")
     boolean updateProductQuantity(@RequestParam String quantityState, @RequestParam String productId);

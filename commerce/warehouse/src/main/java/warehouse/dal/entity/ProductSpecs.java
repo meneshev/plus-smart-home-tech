@@ -15,7 +15,7 @@ import java.util.UUID;
 @Table(schema = "storage", name = "ProductSpecs")
 public class ProductSpecs {
     @Id
-    @Column(name = "Product_id")
+    @Column(name = "Product_id", columnDefinition = "uuid")
     private UUID productId;
 
     @Column(name = "ProductSpecs_isFragile")

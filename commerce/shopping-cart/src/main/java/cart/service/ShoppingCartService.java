@@ -1,7 +1,7 @@
 package cart.service;
 
-import dto.ChangeProductQuantityRequest;
-import dto.ShoppingCartDto;
+import dto.cart.ChangeProductQuantityRequest;
+import dto.cart.ShoppingCartDto;
 
 import java.util.List;
 import java.util.Map;

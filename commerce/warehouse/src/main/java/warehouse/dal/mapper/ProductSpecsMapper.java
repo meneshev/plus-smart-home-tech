@@ -1,10 +1,9 @@
 package warehouse.dal.mapper;
 
-import dto.NewProductInWarehouseRequest;
+import dto.warehouse.NewProductInWarehouseRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import warehouse.dal.entity.ProductSpecs;
-import warehouse.dal.entity.WarehouseProduct;
 
 import java.util.UUID;
 

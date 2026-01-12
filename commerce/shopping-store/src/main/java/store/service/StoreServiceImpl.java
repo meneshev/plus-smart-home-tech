@@ -1,6 +1,9 @@
 package store.service;
 
-import dto.*;
+import dto.store.ProductCategory;
+import dto.store.ProductDto;
+import dto.store.ProductState;
+import dto.store.QuantityState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import store.dal.mapper.ProductMapper;

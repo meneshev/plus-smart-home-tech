@@ -1,7 +1,7 @@
 package feign.shopping.cart;
 
-import dto.ChangeProductQuantityRequest;
-import dto.ShoppingCartDto;
+import dto.cart.ChangeProductQuantityRequest;
+import dto.cart.ShoppingCartDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Map;
 public interface ShoppingCartOperations {
 
     @PutMapping
-    ShoppingCartDto addToCart(@RequestBody String username, @RequestBody Map<String, Long> products);
+    ShoppingCartDto addToCart(@RequestParam String username, @RequestBody Map<String, Long> products);
 
     @GetMapping
     ShoppingCartDto getCart(@RequestParam String username);

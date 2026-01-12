@@ -1,9 +1,9 @@
 package store.dal.mapper;
 
-import dto.ProductCategory;
-import dto.ProductDto;
-import dto.ProductState;
-import dto.QuantityState;
+import dto.store.ProductCategory;
+import dto.store.ProductDto;
+import dto.store.ProductState;
+import dto.store.QuantityState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import store.dal.entity.Product;
